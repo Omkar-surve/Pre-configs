@@ -1,0 +1,202 @@
+!! IOS XR Configuration 6.0.1
+!! Last configuration change at Fri Nov 23 06:43:04 2018 by cisco
+!
+hostname AGG-ASBR13
+interface Loopback0
+ ipv4 address 172.0.0.13 255.255.255.255
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172::13/128
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ description towards AGG-ASBR9 gi0/0/0/2
+ ipv4 address 172.9.13.13 255.255.255.0
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172:9:13::13/112
+!
+interface GigabitEthernet0/0/0/1
+ description towards AGG-ASBR10 gi0/0/0/3
+ ipv4 address 172.10.13.13 255.255.255.0
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172:10:13::13/112
+!
+interface GigabitEthernet0/0/0/2
+ description towards ASBR21 e0/0
+ ipv4 address 172.13.21.13 255.255.255.0
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172:13:21::13/112
+!
+interface GigabitEthernet0/0/0/3
+ description towards ASBR20 e0/1
+ ipv4 address 172.13.20.13 255.255.255.0
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172:13:20::13/112
+!
+interface GigabitEthernet0/0/0/4
+ description towards AGG-ASBR11 gi0/0/0/4
+ ipv4 address 172.11.13.13 255.255.255.0
+ ipv6 address fe80::13 link-local
+ ipv6 address 2018:abcd:172:11:13::13/112
+!
+prefix-set Loopback
+  # Loopbacks connected to this device #
+  172.0.0.13/32,
+  2018:abcd:172::13/128
+end-set
+!
+route-policy Loopback
+  if destination in Loopback then
+    pass
+  endif
+end-policy
+!
+router isis CORE
+ is-type level-1
+ net 49.0001.0172.0001.0013.00
+ address-family ipv4 unicast
+  metric-style wide
+  advertise passive-only
+  mpls ldp auto-config
+ !
+ address-family ipv6 unicast
+  metric-style wide
+  advertise passive-only
+ !
+ interface Loopback0
+  passive
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/4
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+!
+router isis AGG_CORE
+ is-type level-2-only
+ net 49.0001.0172.0000.0013.00
+ address-family ipv4 unicast
+  metric-style wide
+  advertise passive-only
+  redistribute connected route-policy Loopback
+  mpls ldp auto-config
+ !
+ address-family ipv6 unicast
+  metric-style wide
+  advertise passive-only
+  redistribute connected route-policy Loopback
+ !
+ interface GigabitEthernet0/0/0/1
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/2
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/3
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+!
+router bgp 65534
+ bgp router-id 172.0.0.13
+ ibgp policy out enforce-modifications
+ address-family ipv4 unicast
+  network 172.0.0.13/32
+ !
+ address-family vpnv4 unicast
+  retain route-target all
+ !
+ address-family ipv6 unicast
+  network 2018:abcd:172::13/128
+ !
+ address-family vpnv6 unicast
+  retain route-target all
+ !
+ af-group CORE_IPV4 address-family ipv4 unicast
+  next-hop-self
+ !
+ af-group CORE_IPV6 address-family ipv6 unicast
+  next-hop-self
+ !
+ session-group CORE
+  remote-as 65534
+  update-source Loopback0
+ !
+ neighbor-group AGG-CORE
+  remote-as 65534
+  cluster-id 172.0.0.13
+  update-source Loopback0
+  address-family ipv4 unicast
+   route-reflector-client
+   next-hop-self
+  !
+  address-family ipv6 unicast
+   route-reflector-client
+   next-hop-self
+  !
+ !
+ neighbor 172.0.0.9
+  use session-group CORE
+  address-family ipv4 unicast
+   use af-group CORE_IPV4
+  !
+  address-family ipv6 unicast
+   use af-group CORE_IPV6
+  !
+ !
+ neighbor 172.0.0.10
+  use session-group CORE
+  address-family ipv4 unicast
+   use af-group CORE_IPV4
+  !
+  address-family ipv6 unicast
+   use af-group CORE_IPV6
+  !
+ !
+ neighbor 172.0.0.11
+  use session-group CORE
+  address-family ipv4 unicast
+   use af-group CORE_IPV4
+  !
+  address-family ipv6 unicast
+   use af-group CORE_IPV6
+  !
+ !
+ neighbor 172.0.0.20
+  use neighbor-group AGG-CORE
+ !
+ neighbor 172.0.0.21
+  use neighbor-group AGG-CORE
+ !
+!
+mpls ldp
+ router-id 172.0.0.13
+!
+mpls label range table 0 101300 101399
+end

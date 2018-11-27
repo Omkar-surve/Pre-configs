@@ -1,0 +1,330 @@
+Current configuration : 7087 bytes
+!
+! Last configuration change at 15:41:16 UTC Tue Nov 27 2018
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname AGG-ASBR6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+
+
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 100600 100699
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9669EJJO1K5
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+!
+!
+!         
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!         
+!
+interface Loopback0
+ ip address 172.0.0.6 255.255.255.255
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:172::6/128
+!
+interface GigabitEthernet1
+ description towards ASBR3 gi3
+ ip address 192.3.6.6 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:192:3:6::6/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet2
+ description towards ASBR2 gi0/0/0/2
+ ip address 192.2.6.6 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:192:2:6::6/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet3
+ description towards AGG-ASBR5 gi1
+ ip address 172.5.6.6 255.255.255.0
+ ip router isis CORE
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:172:5:6::6/112
+ ipv6 router isis CORE
+ isis circuit-type level-1
+ isis network point-to-point 
+!
+interface GigabitEthernet4
+ description towards AGG-ASBR12 gi2
+ ip address 172.6.12.6 255.255.255.0
+ ip router isis CORE
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:172:6:12::6/112
+ ipv6 router isis CORE
+ isis network point-to-point 
+!
+interface GigabitEthernet5
+ description towards ASBR17 e0/1
+ ip address 172.6.17.6 255.255.255.0
+ ip router isis AGG_CORE
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:172:6:17::6/112
+ ipv6 router isis AGG_CORE
+ isis circuit-type level-2-only
+ isis network point-to-point 
+!
+interface GigabitEthernet6
+ description towards ASBR16 e0/2
+ ip address 172.6.16.6 255.255.255.0
+ ip router isis AGG_CORE
+ negotiation auto
+ ipv6 address FE80::6 link-local
+ ipv6 address 2018:ABCD:172:6:16::6/112
+ ipv6 router isis AGG_CORE
+ isis circuit-type level-2-only
+ isis network point-to-point 
+!
+router isis AGG_CORE
+ net 49.0001.0172.1000.0006.00
+ advertise passive-only
+ metric-style wide
+ !
+ address-family ipv6
+  multi-topology
+  advertise passive-only
+ exit-address-family
+ mpls ldp autoconfig
+!
+router isis CORE
+ net 49.0001.0172.0000.0006.00
+ advertise passive-only
+ metric-style wide
+ passive-interface Loopback0
+ !
+ address-family ipv6
+  multi-topology
+  advertise passive-only
+ exit-address-family
+ mpls ldp autoconfig
+!
+router bgp 65534
+ template peer-policy AGG_CORE_IBGP_IPv4
+  route-reflector-client
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-policy AGG_CORE_IBGP_IPv6
+  route-reflector-client
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-session AGG_CORE_IBGP
+  remote-as 65534
+  description ##### All AGG_CORE network ######
+  cluster-id 172.0.0.6
+  update-source Loopback0
+ exit-peer-session
+ !
+ bgp router-id 172.0.0.6
+ bgp log-neighbor-changes
+ no bgp default route-target filter
+ neighbor S-CORE peer-group
+ neighbor S-CORE remote-as 65535
+ neighbor CORE peer-group
+ neighbor CORE remote-as 65534
+ neighbor CORE update-source Loopback0
+ neighbor CORE_TO_RAN peer-group
+ neighbor CORE_TO_RAN remote-as 65534
+ neighbor CORE_TO_RAN update-source Loopback0
+ neighbor 172.0.0.4 peer-group CORE
+ neighbor 172.0.0.5 peer-group CORE
+ neighbor 172.0.0.12 peer-group CORE
+ neighbor 172.0.0.16 inherit peer-session AGG_CORE_IBGP
+ neighbor 172.0.0.17 inherit peer-session AGG_CORE_IBGP
+ neighbor 172.0.0.22 peer-group CORE_TO_RAN
+ neighbor 172.0.0.24 peer-group CORE_TO_RAN
+ neighbor 172.0.0.26 peer-group CORE_TO_RAN
+ neighbor 172.0.0.27 peer-group CORE_TO_RAN
+ neighbor 192.2.6.2 peer-group S-CORE
+ neighbor 192.3.6.3 peer-group S-CORE
+ !
+ address-family ipv4
+  network 172.0.0.6 mask 255.255.255.255
+  neighbor CORE next-hop-self all
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.5 activate
+  neighbor 172.0.0.12 activate
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG_CORE_IBGP_IPv4
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG_CORE_IBGP_IPv4
+  no neighbor 172.0.0.22 activate
+  no neighbor 172.0.0.24 activate
+  no neighbor 172.0.0.26 activate
+  no neighbor 172.0.0.27 activate
+  no neighbor 192.2.6.2 activate
+  no neighbor 192.3.6.3 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor S-CORE send-community extended
+  neighbor S-CORE next-hop-self all
+  neighbor CORE_TO_RAN send-community extended
+  neighbor CORE_TO_RAN route-reflector-client
+  neighbor CORE_TO_RAN next-hop-self all
+  neighbor 172.0.0.22 activate
+  neighbor 172.0.0.24 activate
+  neighbor 172.0.0.26 activate
+  neighbor 172.0.0.27 activate
+  neighbor 192.2.6.2 activate
+  neighbor 192.3.6.3 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network 2018:ABCD:172::6/128
+  neighbor CORE next-hop-self all
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.5 activate
+  neighbor 172.0.0.12 activate
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG_CORE_IBGP_IPv4
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG_CORE_IBGP_IPv4
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor S-CORE send-community extended
+  neighbor S-CORE next-hop-self all
+  neighbor CORE_TO_RAN send-community extended
+  neighbor CORE_TO_RAN route-reflector-client
+  neighbor CORE_TO_RAN next-hop-self all
+  neighbor 172.0.0.22 activate
+  neighbor 172.0.0.24 activate
+  neighbor 172.0.0.26 activate
+  neighbor 172.0.0.27 activate
+  neighbor 192.2.6.2 activate
+  neighbor 192.3.6.3 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+ipv6 prefix-list Loopback-IPv6 seq 5 permit 2018:ABCD:172::4/128
+ipv6 prefix-list Loopback-IPv6 seq 10 permit 2018:ABCD:172::6/128
+ipv6 prefix-list Loopback-IPv6 seq 15 permit 2018:ABCD:172::10/128
+ipv6 prefix-list Loopback-IPv6 seq 20 permit 2018:ABCD:172::11/128
+ipv6 prefix-list Loopback-IPv6 seq 25 permit 2018:ABCD:172::12/128
+ipv6 prefix-list Loopback-IPv6 seq 30 permit 2018:ABCD:172::13/128
+ipv6 prefix-list Loopback-IPv6 seq 35 permit 2018:ABCD:172::14/128
+ipv6 prefix-list Loopback-IPv6 seq 40 permit 2018:ABCD:172::15/128
+ipv6 prefix-list Loopback-IPv6 seq 45 permit 2018:ABCD:172::16/128
+ipv6 prefix-list Loopback-IPv6 seq 50 permit 2018:ABCD:172::17/128
+ipv6 prefix-list Loopback-IPv6 seq 55 permit 2018:ABCD:192::1/128
+ipv6 prefix-list Loopback-IPv6 seq 60 permit 2018:ABCD:192::2/128
+ipv6 prefix-list Loopback-IPv6 seq 65 permit 2018:ABCD:192::3/128
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0
+ login    
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
+!
+!
+end

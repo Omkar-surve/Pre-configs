@@ -1,0 +1,159 @@
+!! IOS XR Configuration 6.0.1
+!! Last configuration change at Tue Nov 27 14:53:33 2018 by cisco
+!
+hostname PE23
+vrf Client_3
+ description AS200 IGP RIP BGP
+ address-family ipv4 unicast
+  import route-target
+   200:200
+  !
+  export route-target
+   200:200
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   200:200
+  !
+  export route-target
+   200:200
+  !
+ !
+!
+interface Loopback0
+ ipv4 address 172.0.0.23 255.255.255.255
+ ipv6 address fe80::23 link-local
+ ipv6 address 2018:abcd:172::23/128
+!
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ description towards ASBR20 e0/2
+ ipv4 address 172.20.23.23 255.255.255.0
+ ipv6 address fe80::23 link-local
+ ipv6 address 2018:abcd:172:20:23::23/112
+!
+interface GigabitEthernet0/0/0/1
+ description towards ASBR21 e1/0
+ ipv4 address 172.21.23.23 255.255.255.0
+ ipv6 address fe80::23 link-local
+ ipv6 address 2018:abcd:172:21:23::23/112
+!
+interface GigabitEthernet0/0/0/2
+ description towards CE37 e0/0
+ vrf Client_3
+ ipv4 address 10.23.37.23 255.255.255.0
+ ipv6 address fe80::23 link-local
+ ipv6 address 2018:c3:10:23:37::23/112
+!
+route-policy eBGP_all
+  pass
+end-policy
+!
+router ospf 1
+ router-id 172.0.0.23
+ address-family ipv4 unicast
+ area 0
+  network point-to-point
+  mpls ldp auto-config
+  interface Loopback0
+   passive enable
+  !
+  interface GigabitEthernet0/0/0/0
+  !
+  interface GigabitEthernet0/0/0/1
+  !
+ !
+!
+router ospfv3 1
+ router-id 172.0.0.23
+ area 0
+  network point-to-point
+  interface Loopback0
+   passive disable
+  !
+  interface GigabitEthernet0/0/0/0
+  !
+  interface GigabitEthernet0/0/0/1
+  !
+ !
+ address-family ipv6 unicast
+!
+router bgp 65534
+ bgp router-id 172.0.0.23
+ address-family ipv4 unicast
+  network 172.0.0.23/32
+ !
+ address-family vpnv4 unicast
+  retain route-target all
+ !
+ address-family ipv6 unicast
+  network 2018:abcd:172::23/128
+ !
+ address-family vpnv6 unicast
+  retain route-target all
+ !
+ neighbor-group CORE
+  remote-as 65534
+  update-source Loopback0
+  address-family vpnv4 unicast
+   next-hop-self
+  !
+  address-family vpnv6 unicast
+   next-hop-self
+  !
+ !
+ neighbor-group AGG-CORE
+  remote-as 65534
+  update-source Loopback0
+  address-family ipv4 unicast
+   next-hop-self
+  !
+  address-family ipv6 unicast
+   next-hop-self
+  !
+ !
+ neighbor 172.0.0.9
+  use neighbor-group CORE
+ !
+ neighbor 172.0.0.10
+  use neighbor-group CORE
+ !
+ neighbor 172.0.0.20
+  use neighbor-group AGG-CORE
+ !
+ neighbor 172.0.0.21
+  use neighbor-group AGG-CORE
+ !
+ vrf Client_3
+  rd 200:200
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+  neighbor 10.23.37.37
+   remote-as 200
+   address-family ipv4 unicast
+    route-policy eBGP_all in
+    route-policy eBGP_all out
+    send-extended-community-ebgp
+    next-hop-self
+   !
+   address-family ipv6 unicast
+    route-policy eBGP_all in
+    route-policy eBGP_all out
+    send-extended-community-ebgp
+    next-hop-self
+   !
+  !
+ !
+!
+mpls ldp
+ router-id 172.0.0.23
+ address-family ipv4
+ !
+!
+mpls label range table 0 102300 102399
+end

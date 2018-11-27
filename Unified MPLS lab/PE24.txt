@@ -1,0 +1,280 @@
+Current configuration : 4894 bytes
+!
+! Last configuration change at 14:45:48 UTC Tue Nov 27 2018
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname PE24
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Client_2
+ description AS10 IGP OSPF BGP
+ rd 10:10
+ route-target export 10:10
+ route-target import 10:10
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+no process cpu autoprofile hog
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+!         
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 102400 102499
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+license udi pid CSR1000V sn 9Y3VOV6PRES
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface Loopback0
+ ip address 172.0.0.24 255.255.255.255
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::24 link-local
+ ipv6 address 2018:ABCD:172::24/128
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!         
+interface GigabitEthernet1
+ description towards ASBR17 e0/3
+ ip address 172.17.24.24 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ negotiation auto
+ ipv6 address FE80::24 link-local
+ ipv6 address 2018:ABCD:172:17:24::24/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface GigabitEthernet2
+ description towards ASBR16 e1/0
+ ip address 172.16.24.24 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ negotiation auto
+ ipv6 address FE80::24 link-local
+ ipv6 address 2018:ABCD:172:16:24::24/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface GigabitEthernet3
+ description towards CE33 e0/0
+ vrf forwarding Client_2
+ ip address 10.24.33.24 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::24 link-local
+ ipv6 address 2018:C2:10:24:33::24/112
+!
+interface GigabitEthernet4
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospf 1
+ router-id 172.0.0.24
+ passive-interface Loopback0
+ mpls ldp autoconfig
+!
+router bgp 65534
+ template peer-policy AGG-CORE_IBGP_IPv4
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !        
+ template peer-policy AGG-CORE_IBGP_IPv6
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-session AGG-CORE_IBGP
+  remote-as 65534
+  description ##### All AGG-CORE network ######
+  log-neighbor-changes
+  update-source Loopback0
+ exit-peer-session
+ !
+ bgp router-id 172.0.0.24
+ bgp log-neighbor-changes
+ no bgp default route-target filter
+ neighbor RAN peer-group
+ neighbor RAN remote-as 65534
+ neighbor RAN update-source Loopback0
+ neighbor CORE peer-group
+ neighbor CORE remote-as 65534
+ neighbor CORE update-source Loopback0
+ neighbor 172.0.0.4 peer-group CORE
+ neighbor 172.0.0.6 peer-group CORE
+ neighbor 172.0.0.16 inherit peer-session AGG-CORE_IBGP
+ neighbor 172.0.0.17 inherit peer-session AGG-CORE_IBGP
+ neighbor 172.0.0.27 peer-group RAN
+ !
+ address-family ipv4
+  network 172.0.0.24 mask 255.255.255.255
+  neighbor RAN next-hop-self all
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG-CORE_IBGP_IPv4
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG-CORE_IBGP_IPv4
+  neighbor 172.0.0.27 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+ exit-address-family
+ !        
+ address-family ipv6
+  network 2018:ABCD:172::24/128
+  neighbor RAN next-hop-self all
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG-CORE_IBGP_IPv6
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG-CORE_IBGP_IPv6
+  neighbor 172.0.0.27 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf Client_2
+  import path selection all
+  import path limit 2
+  neighbor 10.24.33.33 remote-as 10
+  neighbor 10.24.33.33 activate
+  neighbor 10.24.33.33 send-community extended
+  neighbor 10.24.33.33 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf Client_2
+  neighbor 10.24.33.33 remote-as 10
+  neighbor 10.24.33.33 activate
+  neighbor 10.24.33.33 send-community extended
+  neighbor 10.24.33.33 next-hop-self
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 router ospf 1
+ router-id 172.0.0.24
+ passive-interface Loopback0
+!
+!         
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ login
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
+!
+!
+end

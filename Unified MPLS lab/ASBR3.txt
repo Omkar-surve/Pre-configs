@@ -1,0 +1,226 @@
+Current configuration : 3383 bytes
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname ASBR3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+
+
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 100300 100399
+multilink bundle-name authenticated
+!         
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9PCTLHHI500
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+!
+!
+!
+!
+!         
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface Loopback0
+ ip address 192.0.0.3 255.255.255.255
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192::3/128
+!
+interface GigabitEthernet1
+ description towards P1 e0/0
+ ip address 192.1.3.3 255.255.255.0
+ ip router isis CORE
+ negotiation auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192:1:3::3/112
+ ipv6 router isis CORE
+ isis network point-to-point 
+!
+interface GigabitEthernet2
+ description towards AGG-ASBR4 gi1
+ ip address 192.3.4.3 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192:3:4::3/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet3
+ description towards AGG-ASBR6 gi1
+ ip address 192.3.6.3 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192:3:6::3/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet4
+ description towards AGG-ASBR9 gi0/0/0/0
+ ip address 192.3.9.3 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192:3:9::3/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet5
+ description towards AGG-ASBR10 gi0/0/0/0
+ ip address 192.3.10.3 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::3 link-local
+ ipv6 address 2018:ABCD:192:3:10::3/112
+ mpls bgp forwarding
+!         
+interface GigabitEthernet6
+ description towards INET7 gi1
+ no ip address
+ negotiation auto
+!
+router isis CORE
+ net 49.0001.0172.0001.0003.00
+ is-type level-2-only
+ advertise passive-only
+ metric-style wide
+ passive-interface Loopback0
+ !
+ address-family ipv6
+  multi-topology
+ exit-address-family
+ mpls ldp autoconfig
+!
+router bgp 65535
+ bgp router-id 192.0.0.3
+ bgp log-neighbor-changes
+ no bgp default route-target filter
+ neighbor CORE peer-group
+ neighbor CORE remote-as 65534
+ neighbor 192.3.4.4 peer-group CORE
+ neighbor 192.3.6.6 peer-group CORE
+ neighbor 192.3.9.9 peer-group CORE
+ neighbor 192.3.10.10 peer-group CORE
+ !
+ address-family ipv4
+  no neighbor 192.3.4.4 activate
+  no neighbor 192.3.6.6 activate
+  no neighbor 192.3.9.9 activate
+  no neighbor 192.3.10.10 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self all
+  neighbor 192.3.4.4 activate
+  neighbor 192.3.6.6 activate
+  neighbor 192.3.9.9 activate
+  neighbor 192.3.10.10 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self all
+  neighbor 192.3.4.4 activate
+  neighbor 192.3.6.6 activate
+  neighbor 192.3.9.9 activate
+  neighbor 192.3.10.10 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+ !
+ !        
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0
+ login
+line vty 1
+ login
+ length 0
+line vty 2 4
+ login
+!
+!
+end

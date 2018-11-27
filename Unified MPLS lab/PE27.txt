@@ -1,0 +1,250 @@
+Current configuration : 4698 bytes
+!
+! Last configuration change at 16:45:45 EET Tue Nov 27 2018
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname PE27
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Client_1
+ description AS100 IGP EIGRP BGP
+ rd 100:100
+ route-target export 100:100
+ route-target import 100:100
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+mpls label range 102700 102799
+!
+!
+!
+!
+!
+!         
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 172.0.0.27 255.255.255.255
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::27 link-local
+ ipv6 address 2018:ABCD:172::27/128
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet0/0
+ description towards ASBR16 e0/3
+ ip address 172.16.27.27 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::27 link-local
+ ipv6 address 2018:ABCD:172:16:27::27/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet0/1
+ description towards ASBR17 e1/0
+ ip address 172.17.27.27 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::27 link-local
+ ipv6 address 2018:ABCD:172:17:27::27/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet0/2
+ description towards CE32 e0/0
+ vrf forwarding Client_1
+ ip address 10.27.32.27 255.255.255.0
+ ipv6 address FE80::27 link-local
+ ipv6 address 2018:C1:10:27:32::27/112
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+router ospf 1
+ mpls ldp autoconfig
+ router-id 172.0.0.27
+ passive-interface Loopback0
+!
+router bgp 65534
+ template peer-policy AGG-CORE_IBGP_IPv4
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-policy AGG-CORE_IBGP_IPv6
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-session AGG-CORE_IBGP
+  remote-as 65534
+  description ##### All AGG-CORE network ######
+  log-neighbor-changes
+  update-source Loopback0
+ exit-peer-session
+ !
+ bgp router-id 172.0.0.27
+ bgp log-neighbor-changes
+ no bgp default route-target filter
+ neighbor RAN peer-group
+ neighbor RAN remote-as 65534
+ neighbor RAN update-source Loopback0
+ neighbor CORE peer-group
+ neighbor CORE remote-as 65534
+ neighbor CORE update-source Loopback0
+ neighbor 172.0.0.4 peer-group CORE
+ neighbor 172.0.0.6 peer-group CORE
+ neighbor 172.0.0.16 inherit peer-session AGG-CORE_IBGP
+ neighbor 172.0.0.17 inherit peer-session AGG-CORE_IBGP
+ neighbor 172.0.0.24 peer-group RAN
+ !
+ address-family ipv4
+  network 172.0.0.27 mask 255.255.255.255
+  neighbor RAN next-hop-self all
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG-CORE_IBGP_IPv4
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG-CORE_IBGP_IPv4
+  neighbor 172.0.0.24 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network 2018:ABCD:172::27/128
+  neighbor RAN next-hop-self all
+  neighbor 172.0.0.16 activate
+  neighbor 172.0.0.16 inherit peer-policy AGG-CORE_IBGP_IPv6
+  neighbor 172.0.0.17 activate
+  neighbor 172.0.0.17 inherit peer-policy AGG-CORE_IBGP_IPv6
+  neighbor 172.0.0.24 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor CORE send-community extended
+  neighbor CORE next-hop-self
+  neighbor 172.0.0.4 activate
+  neighbor 172.0.0.6 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf Client_1
+  neighbor 10.27.32.32 remote-as 100
+  neighbor 10.27.32.32 activate
+  neighbor 10.27.32.32 send-community extended
+  neighbor 10.27.32.32 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf Client_1
+  neighbor 10.27.32.32 remote-as 100
+  neighbor 10.27.32.32 activate
+  neighbor 10.27.32.32 send-community extended
+  neighbor 10.27.32.32 next-hop-self
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 router ospf 1
+ router-id 172.0.0.27
+ passive-interface Loopback0
+!
+!
+!         
+mpls ldp router-id Loopback0 force
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

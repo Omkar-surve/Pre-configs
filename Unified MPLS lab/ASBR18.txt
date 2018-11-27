@@ -1,0 +1,264 @@
+Current configuration : 5113 bytes
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ASBR18
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+ipv6 cef  
+!
+multilink bundle-name authenticated
+mpls label range 101800 101899
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 172.0.0.18 255.255.255.255
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172::18/128
+!
+interface Ethernet0/0
+ description towards AGG-ASBR11 gi0/0/0/2
+ ip address 172.11.18.18 255.255.255.0
+ ip router isis AGG_CORE
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172:11:18::18/112
+ ipv6 router isis AGG_CORE
+ isis network point-to-point 
+!
+interface Ethernet0/1
+ description towards AGG-ASBR9 gi0/0/0/5
+ ip address 172.9.18.18 255.255.255.0
+ ip router isis AGG_CORE
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172:9:18::18/112
+ ipv6 router isis AGG_CORE
+ isis network point-to-point 
+!
+interface Ethernet0/2
+ description towards ASBR19 e0/2
+ ip address 172.18.19.18 255.255.255.0
+ ip router isis AGG_CORE
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172:18:19::18/112
+ ipv6 router isis AGG_CORE
+ isis network point-to-point 
+!
+interface Ethernet0/3
+ description towards PE28 e0/0
+ ip address 172.18.28.18 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172:18:28::18/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet1/0
+ description towards PE25 gi2
+ ip address 172.18.25.18 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address FE80::18 link-local
+ ipv6 address 2018:ABCD:172:18:25::18/112
+ ipv6 ospf 1 area 0
+ ipv6 ospf network point-to-point
+!
+interface Ethernet1/1
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no ip address
+ shutdown
+!
+router ospf 1
+ mpls ldp autoconfig
+ router-id 172.0.0.18
+ redistribute connected subnets route-map LOOPBACK
+!
+router isis AGG_CORE
+ mpls ldp autoconfig
+ net 49.0001.0172.0000.0018.00
+ is-type level-2-only
+ advertise passive-only
+ metric-style wide
+ passive-interface Loopback0
+ !
+ address-family ipv6
+  multi-topology
+  advertise passive-only
+ exit-address-family
+!
+router bgp 65534
+ template peer-policy RAN_IBGP_IPv4
+  route-reflector-client
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-policy RAN_IBGP_IPv6
+  route-reflector-client
+  next-hop-self all
+  send-community extended
+ exit-peer-policy
+ !
+ template peer-session RAN_IBGP
+  remote-as 65534
+  description ##### All RAN network ######
+  log-neighbor-changes
+  cluster-id 172.0.0.18
+  update-source Loopback0
+ exit-peer-session
+ !
+ bgp router-id 172.0.0.18
+ bgp log-neighbor-changes
+ no bgp default route-target filter
+ neighbor CORE peer-group
+ neighbor CORE remote-as 65534
+ neighbor CORE update-source Loopback0
+ neighbor AGG-CORE peer-group
+ neighbor AGG-CORE remote-as 65534
+ neighbor AGG-CORE update-source Loopback0
+ neighbor 172.0.0.9 peer-group CORE
+ neighbor 172.0.0.11 peer-group CORE
+ neighbor 172.0.0.19 peer-group AGG-CORE
+ neighbor 172.0.0.25 inherit peer-session RAN_IBGP
+ neighbor 172.0.0.28 inherit peer-session RAN_IBGP
+ !
+ address-family ipv4
+  network 172.0.0.18 mask 255.255.255.255
+  neighbor CORE next-hop-self all
+  neighbor AGG-CORE next-hop-self all
+  neighbor 172.0.0.9 activate
+  neighbor 172.0.0.11 activate
+  neighbor 172.0.0.19 activate
+  neighbor 172.0.0.25 activate
+  neighbor 172.0.0.25 inherit peer-policy RAN_IBGP_IPv4
+  neighbor 172.0.0.28 activate
+  neighbor 172.0.0.28 inherit peer-policy RAN_IBGP_IPv4
+ exit-address-family
+ !        
+ address-family ipv6
+  network 2018:ABCD:172::18/128
+  neighbor CORE next-hop-self all
+  neighbor AGG-CORE next-hop-self all
+  neighbor 172.0.0.9 activate
+  neighbor 172.0.0.11 activate
+  neighbor 172.0.0.19 activate
+  neighbor 172.0.0.25 activate
+  neighbor 172.0.0.25 inherit peer-policy RAN_IBGP_IPv6
+  neighbor 172.0.0.28 activate
+  neighbor 172.0.0.28 inherit peer-policy RAN_IBGP_IPv6
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list LOOPBACK_IPV4 description Loopback 0 ipv4 address
+ip prefix-list LOOPBACK_IPV4 seq 5 permit 172.0.0.18/32
+ipv6 router ospf 1
+ router-id 172.0.0.18
+ redistribute connected route-map LOOPBACK_v6
+!
+!
+!
+ipv6 prefix-list LOOPBACK_IPV6 description Loopback 0 ipv6 address
+ipv6 prefix-list LOOPBACK_IPV6 seq 5 permit 2018:ABCD:172::18/128
+route-map LOOPBACK_v6 permit 10
+ match ipv6 address prefix-list LOOPBACK_IPV6
+!
+route-map LOOPBACK permit 10
+ match ip address prefix-list LOOPBACK_IPV4
+!
+!
+mpls ldp router-id Loopback0 force
+!
+control-plane
+!
+!
+!
+!
+!
+!         
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
