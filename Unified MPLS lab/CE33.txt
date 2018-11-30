@@ -1,5 +1,6 @@
-
-Current configuration : 1768 bytes
+Current configuration : 1957 bytes
+!
+! Last configuration change at 08:02:36 EET Fri Nov 30 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -42,9 +43,9 @@ mmi snmp-timeout 180
 !
 !
 !
-ip cef
+ip cef    
 ipv6 unicast-routing
-ipv6 cef  
+ipv6 cef
 !
 multilink bundle-name authenticated
 !
@@ -65,9 +66,9 @@ redundancy
 !
 !
 !
-!
-!
 !         
+!
+!
 !
 !
 !
@@ -88,7 +89,7 @@ interface Ethernet0/0
 interface Ethernet0/1
  no ip address
  shutdown
-!
+!         
 interface Ethernet0/2
  no ip address
  shutdown
@@ -101,6 +102,7 @@ router bgp 10
  bgp router-id 10.0.0.33
  bgp log-neighbor-changes
  neighbor 10.24.33.24 remote-as 65534
+ neighbor 2018:C2:10:24:33::24 remote-as 65534
  !
  address-family ipv4
   network 10.0.0.33 mask 255.255.255.255
@@ -108,14 +110,15 @@ router bgp 10
   neighbor 10.24.33.24 send-community extended
   neighbor 10.24.33.24 next-hop-self
   neighbor 10.24.33.24 allowas-in
+  no neighbor 2018:C2:10:24:33::24 activate
  exit-address-family
- !
+ !        
  address-family ipv6
-  network 2018:C1:10::33/128
-  neighbor 10.24.33.24 activate
-  neighbor 10.24.33.24 send-community extended
-  neighbor 10.24.33.24 next-hop-self
-  neighbor 10.24.33.24 allowas-in
+  network 2018:C2:10::33/128
+  neighbor 2018:C2:10:24:33::24 activate
+  neighbor 2018:C2:10:24:33::24 send-community extended
+  neighbor 2018:C2:10:24:33::24 next-hop-self
+  neighbor 2018:C2:10:24:33::24 allowas-in
  exit-address-family
 !
 ip forward-protocol nd
@@ -132,7 +135,7 @@ control-plane
 !
 !
 !
-!
+!         
 !
 !
 !

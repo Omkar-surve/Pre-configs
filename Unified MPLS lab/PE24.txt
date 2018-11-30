@@ -1,6 +1,6 @@
-Current configuration : 4894 bytes
+Current configuration : 4926 bytes
 !
-! Last configuration change at 14:45:48 UTC Tue Nov 27 2018
+! Last configuration change at 06:11:52 UTC Fri Nov 30 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -227,15 +227,15 @@ router bgp 65534
   import path limit 2
   neighbor 10.24.33.33 remote-as 10
   neighbor 10.24.33.33 activate
-  neighbor 10.24.33.33 send-community extended
+  neighbor 10.24.33.33 send-community both
   neighbor 10.24.33.33 next-hop-self
  exit-address-family
  !
  address-family ipv6 vrf Client_2
-  neighbor 10.24.33.33 remote-as 10
-  neighbor 10.24.33.33 activate
-  neighbor 10.24.33.33 send-community extended
-  neighbor 10.24.33.33 next-hop-self
+  neighbor 2018:C2:10:24:33::33 remote-as 10
+  neighbor 2018:C2:10:24:33::33 activate
+  neighbor 2018:C2:10:24:33::33 send-community extended
+  neighbor 2018:C2:10:24:33::33 next-hop-self
  exit-address-family
 !
 !
