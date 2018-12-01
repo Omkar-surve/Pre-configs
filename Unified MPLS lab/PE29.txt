@@ -1,6 +1,6 @@
-Current configuration : 4692 bytes
+Current configuration : 4727 bytes
 !
-! Last configuration change at 16:48:57 EET Tue Nov 27 2018
+! Last configuration change at 07:44:49 EET Sat Dec 1 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -210,10 +210,10 @@ router bgp 65534
  exit-address-family
  !
  address-family ipv6 vrf Client_2
-  neighbor 10.29.36.36 remote-as 10
-  neighbor 10.29.36.36 activate
-  neighbor 10.29.36.36 send-community extended
-  neighbor 10.29.36.36 next-hop-self
+  neighbor 2018:C2:10:29:36::36 remote-as 10
+  neighbor 2018:C2:10:29:36::36 activate
+  neighbor 2018:C2:10:29:36::36 send-community extended
+  neighbor 2018:C2:10:29:36::36 next-hop-self
  exit-address-family
 !
 ip forward-protocol nd

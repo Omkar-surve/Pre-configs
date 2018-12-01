@@ -1,6 +1,6 @@
-Current configuration : 7087 bytes
+Current configuration : 7148 bytes
 !
-! Last configuration change at 15:41:16 UTC Tue Nov 27 2018
+! Last configuration change at 06:27:02 UTC Sat Dec 1 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -242,6 +242,7 @@ router bgp 65534
  address-family vpnv4
   neighbor S-CORE send-community extended
   neighbor S-CORE next-hop-self all
+  neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
   neighbor CORE_TO_RAN next-hop-self all
@@ -268,6 +269,7 @@ router bgp 65534
  address-family vpnv6
   neighbor S-CORE send-community extended
   neighbor S-CORE next-hop-self all
+  neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
   neighbor CORE_TO_RAN next-hop-self all
@@ -319,7 +321,7 @@ control-plane
 line con 0
  stopbits 1
 line vty 0
- login    
+ login
 line vty 1
  login
  length 0

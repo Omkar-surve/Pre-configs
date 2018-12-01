@@ -1,5 +1,5 @@
 !! IOS XR Configuration 6.0.1
-!! Last configuration change at Fri Nov 23 06:42:48 2018 by cisco
+!! Last configuration change at Sat Dec  1 06:11:05 2018 by cisco
 !
 hostname AGG-ASBR10
 interface Loopback0
@@ -183,6 +183,19 @@ router bgp 65534
    next-hop-self
   !
  !
+ neighbor-group CORE_TO_RAN
+  remote-as 65534
+  cluster-id 172.0.0.10
+  update-source Loopback0
+  address-family vpnv4 unicast
+   route-reflector-client
+   next-hop-self
+  !
+  address-family vpnv6 unicast
+   route-reflector-client
+   next-hop-self
+  !
+ !
  neighbor 172.0.0.9
   use session-group CORE
   address-family ipv4 unicast
@@ -215,6 +228,18 @@ router bgp 65534
  !
  neighbor 172.0.0.21
   use neighbor-group AGG-CORE
+ !
+ neighbor 172.0.0.23
+  use neighbor-group CORE_TO_RAN
+ !
+ neighbor 172.0.0.25
+  use neighbor-group CORE_TO_RAN
+ !
+ neighbor 172.0.0.28
+  use neighbor-group CORE_TO_RAN
+ !
+ neighbor 172.0.0.29
+  use neighbor-group CORE_TO_RAN
  !
  neighbor 192.2.10.2
   use neighbor-group S_CORE
