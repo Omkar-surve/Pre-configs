@@ -1,4 +1,6 @@
-Current configuration : 5589 bytes
+Current configuration : 5676 bytes
+!
+! Last configuration change at 14:01:49 UTC Sun Dec 2 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -18,9 +20,9 @@ no aaa new-model
 !
 !
 !
-!
-!
 !         
+!
+!
 !
 !
 !
@@ -43,7 +45,7 @@ subscriber templating
 !
 mpls label range 101200 101299
 multilink bundle-name authenticated
-!         
+!
 !
 !
 !
@@ -64,30 +66,30 @@ spanning-tree extend system-id
 redundancy
 !
 !
-!
-!
 !         
 !
-! 
-!
-!
-!
-!
-!
-!
-!
-!
-!
-!
 !
 !
 ! 
-! 
-! 
-! 
-! 
-! 
 !
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!         
 !
 interface Loopback0
  ip address 172.0.0.12 255.255.255.255
@@ -158,7 +160,7 @@ router isis CORE
  advertise passive-only
  metric-style wide
  passive-interface Loopback0
- !        
+ !
  address-family ipv6
   multi-topology
   advertise passive-only
@@ -170,14 +172,16 @@ router bgp 65534
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-policy AGG_CORE_IBGP_IPv6
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
- !
+ !        
  template peer-session AGG_CORE_IBGP
   remote-as 65534
   description ##### All AGG_CORE network ######
@@ -223,7 +227,7 @@ router bgp 65534
 !
 !
 virtual-service csr_mgmt
-!
+!         
 ip forward-protocol nd
 !
 no ip http server
@@ -269,7 +273,7 @@ control-plane
 !
 !
 !
-!
+!         
 !
 line con 0
  stopbits 1

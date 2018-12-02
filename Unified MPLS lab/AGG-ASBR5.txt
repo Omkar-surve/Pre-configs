@@ -1,6 +1,6 @@
-Current configuration : 5743 bytes
+Current configuration : 5828 bytes
 !
-! Last configuration change at 13:22:55 UTC Tue Nov 27 2018
+! Last configuration change at 13:56:18 UTC Sun Dec 2 2018
 !
 version 15.4
 service timestamps debug datetime msec
@@ -88,6 +88,7 @@ interface GigabitEthernet1
  description towards AGG-ASBR6 gi3
  ip address 172.5.6.5 255.255.255.0
  ip router isis CORE
+ shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:6::5/112
@@ -100,6 +101,7 @@ interface GigabitEthernet2
  description towards AGG-ASBR4 gi4
  ip address 172.4.5.5 255.255.255.0
  ip router isis CORE
+ shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:4:5::5/112
@@ -111,6 +113,7 @@ interface GigabitEthernet3
  description towards AGG-ASBR12 gi3
  ip address 172.5.12.5 255.255.255.0
  ip router isis CORE
+ shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:12::5/112
@@ -123,6 +126,7 @@ interface GigabitEthernet4
  description towards ASBR15 e0/0
  ip address 172.5.15.5 255.255.255.0
  ip router isis CORE
+ shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:15::5/112
@@ -135,6 +139,7 @@ interface GigabitEthernet5
  description towards ASBR14 e0/1
  ip address 172.5.14.5 255.255.255.0
  ip router isis CORE
+ shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:14::5/112
@@ -145,6 +150,7 @@ interface GigabitEthernet5
 !
 interface GigabitEthernet6
  no ip address
+ shutdown
  negotiation auto
 !
 router isis CORE
@@ -152,24 +158,26 @@ router isis CORE
  advertise passive-only
  metric-style wide
  passive-interface Loopback0
- !
+ !        
  address-family ipv6
   multi-topology
   advertise passive-only
  exit-address-family
  mpls ldp autoconfig
-!         
+!
 router bgp 65534
  template peer-policy AGG_CORE_IBGP_IPv4
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-policy AGG_CORE_IBGP_IPv6
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session AGG_CORE_IBGP
@@ -219,7 +227,7 @@ router bgp 65534
 virtual-service csr_mgmt
 !
 ip forward-protocol nd
-!
+!         
 no ip http server
 no ip http secure-server
 !
@@ -227,7 +235,7 @@ no ip http secure-server
 ip prefix-list Loopback seq 10 permit 172.0.0.0/24 le 32
 ip prefix-list Loopback seq 20 permit 192.0.0.0/24 le 32
 !
-!         
+!
 ipv6 prefix-list Loopback-IPv6 seq 5 permit 2018:ABCD:172::4/128
 ipv6 prefix-list Loopback-IPv6 seq 10 permit 2018:ABCD:172::6/128
 ipv6 prefix-list Loopback-IPv6 seq 15 permit 2018:ABCD:172::10/128
@@ -250,7 +258,7 @@ route-map Loopback permit 10
  match ip address prefix-list Loopback
 !
 route-map Loopback permit 20
-!         
+!
 mpls ldp router-id Loopback0 force
 !
 !
@@ -265,7 +273,7 @@ line vty 1
  login
  length 0
 line vty 2 4
- login
+ login    
 !
 !
 end

@@ -1,5 +1,5 @@
 !! IOS XR Configuration 6.0.1
-!! Last configuration change at Fri Nov 23 06:42:00 2018 by cisco
+!! Last configuration change at Sun Dec  2 14:02:09 2018 by cisco
 !
 hostname AGG-ASBR11
 interface Loopback0
@@ -128,12 +128,14 @@ router bgp 65534
  ibgp policy out enforce-modifications
  address-family ipv4 unicast
   network 172.0.0.11/32
+  allocate-label all
  !
  address-family vpnv4 unicast
   retain route-target all
  !
  address-family ipv6 unicast
   network 2018:abcd:172::11/128
+  allocate-label all
  !
  address-family vpnv6 unicast
   retain route-target all
@@ -152,11 +154,11 @@ router bgp 65534
   remote-as 65534
   cluster-id 172.0.0.11
   update-source Loopback0
-  address-family ipv4 unicast
+  address-family ipv4 labeled-unicast
    route-reflector-client
    next-hop-self
   !
-  address-family ipv6 unicast
+  address-family ipv6 labeled-unicast
    route-reflector-client
    next-hop-self
   !

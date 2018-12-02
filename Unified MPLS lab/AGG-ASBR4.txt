@@ -1,6 +1,6 @@
-Current configuration : 6885 bytes
+Current configuration : 6911 bytes
 !
-! Last configuration change at 06:26:16 UTC Sat Dec 1 2018
+! Last configuration change at 13:50:04 UTC Sun Dec 2 2018
 !
 version 15.4
 service timestamps debug datetime msec
@@ -156,12 +156,14 @@ router bgp 65534
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
- !
+ !        
  template peer-policy AGG_CORE_IBGP_IPv6
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session AGG_CORE_IBGP
@@ -294,4 +296,4 @@ line vty 2 4
  login
 !
 !
-end
+end 

@@ -1,4 +1,7 @@
-Current configuration : 5146 bytes
+
+Current configuration : 5287 bytes
+!
+! Last configuration change at 15:39:54 EET Sun Dec 2 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -41,9 +44,9 @@ mmi snmp-timeout 180
 !
 !
 !
-ip cef
+ip cef    
 ipv6 unicast-routing
-ipv6 cef  
+ipv6 cef
 !
 multilink bundle-name authenticated
 mpls label range 101400 101499
@@ -64,9 +67,9 @@ redundancy
 ! 
 !
 !
-!
-!
 !         
+!
+!
 !
 !
 !
@@ -133,7 +136,7 @@ interface Ethernet1/0
 !
 interface Ethernet1/1
  no ip address
- shutdown
+ shutdown 
 !
 interface Ethernet1/2
  no ip address
@@ -166,12 +169,14 @@ router bgp 65534
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-policy RAN_IBGP_IPv6
   route-reflector-client
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session RAN_IBGP
@@ -181,7 +186,7 @@ router bgp 65534
   cluster-id 172.0.0.14
   update-source Loopback0
  exit-peer-session
- !        
+ !
  bgp router-id 172.0.0.14
  bgp log-neighbor-changes
  no bgp default route-target filter
@@ -200,6 +205,7 @@ router bgp 65534
  address-family ipv4
   network 172.0.0.14 mask 255.255.255.255
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor AGG-CORE next-hop-self all
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.5 activate
@@ -213,6 +219,7 @@ router bgp 65534
  address-family ipv6
   network 2018:ABCD:172::14/128
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor AGG-CORE next-hop-self all
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.5 activate
@@ -250,7 +257,7 @@ route-map LOOPBACK permit 10
 mpls ldp router-id Loopback0 force
 !
 control-plane
-!         
+!
 !
 !
 !

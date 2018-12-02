@@ -1,4 +1,6 @@
-Current configuration : 4668 bytes
+Current configuration : 4755 bytes
+!
+! Last configuration change at 15:29:15 EET Sun Dec 2 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -41,9 +43,9 @@ mmi snmp-timeout 180
 !
 !
 !
-!
-!
 !         
+!
+!
 !
 !
 !
@@ -64,7 +66,7 @@ mpls label range 102700 102799
 !
 !
 !
-!
+!         
 !
 cts logging verbose
 !
@@ -135,11 +137,13 @@ router bgp 65534
  template peer-policy AGG-CORE_IBGP_IPv4
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-policy AGG-CORE_IBGP_IPv6
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session AGG-CORE_IBGP
@@ -223,11 +227,11 @@ no ip http secure-server
 ipv6 router ospf 1
  router-id 172.0.0.27
  passive-interface Loopback0
-!
+!         
 !
 !
 mpls ldp router-id Loopback0 force
-!         
+!
 control-plane
 !
 !

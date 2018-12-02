@@ -1,6 +1,6 @@
-Current configuration : 4727 bytes
+Current configuration : 4753 bytes
 !
-! Last configuration change at 07:43:44 EET Sat Dec 1 2018
+! Last configuration change at 15:28:45 EET Sun Dec 2 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -137,11 +137,13 @@ router bgp 65534
  template peer-policy AGG-CORE_IBGP_IPv4
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-policy AGG-CORE_IBGP_IPv6
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session AGG-CORE_IBGP
@@ -225,9 +227,9 @@ no ip http secure-server
 ipv6 router ospf 1
  router-id 172.0.0.28
  passive-interface Loopback0
-!
-!
 !         
+!
+!
 mpls ldp router-id Loopback0 force
 !
 control-plane

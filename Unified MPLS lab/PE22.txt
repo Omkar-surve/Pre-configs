@@ -1,5 +1,5 @@
 !! IOS XR Configuration 6.0.1
-!! Last configuration change at Sun Dec  2 06:48:14 2018 by cisco
+!! Last configuration change at Sun Dec  2 14:09:31 2018 by cisco
 !
 hostname PE22
 vrf Client_1
@@ -83,14 +83,17 @@ router ospfv3 1
 !
 router bgp 65534
  bgp router-id 172.0.0.22
+ ibgp policy out enforce-modifications
  address-family ipv4 unicast
   network 172.0.0.22/32
+  allocate-label all
  !
  address-family vpnv4 unicast
   retain route-target all
  !
  address-family ipv6 unicast
   network 2018:abcd:172::22/128
+  allocate-label all
  !
  address-family vpnv6 unicast
   retain route-target all
@@ -108,10 +111,10 @@ router bgp 65534
  neighbor-group AGG-CORE
   remote-as 65534
   update-source Loopback0
-  address-family ipv4 unicast
+  address-family ipv4 labeled-unicast
    next-hop-self
   !
-  address-family ipv6 unicast
+  address-family ipv6 labeled-unicast
    next-hop-self
   !
  !

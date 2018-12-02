@@ -1,6 +1,6 @@
-Current configuration : 4767 bytes
+Current configuration : 4793 bytes
 !
-! Last configuration change at 05:41:59 UTC Sat Dec 1 2018
+! Last configuration change at 13:27:49 UTC Sun Dec 2 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -156,11 +156,13 @@ router bgp 65534
  template peer-policy AGG-CORE_IBGP_IPv4
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
- !
+ !        
  template peer-policy AGG-CORE_IBGP_IPv6
   next-hop-self all
   send-community extended
+  send-label
  exit-peer-policy
  !
  template peer-session AGG-CORE_IBGP
@@ -227,7 +229,7 @@ router bgp 65534
   neighbor 10.25.35.35 send-community extended
   neighbor 10.25.35.35 next-hop-self
  exit-address-family
- !        
+ !
  address-family ipv6 vrf Client_3
   neighbor 2018:C3:10:25:35::35 remote-as 200
   neighbor 2018:C3:10:25:35::35 activate
@@ -250,7 +252,7 @@ mpls ldp router-id Loopback0 force
 !
 control-plane
 !
- !        
+ !
  !
  !
  !
