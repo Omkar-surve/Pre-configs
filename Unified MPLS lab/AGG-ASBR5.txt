@@ -1,6 +1,6 @@
-Current configuration : 5828 bytes
+Current configuration : 5882 bytes
 !
-! Last configuration change at 13:56:18 UTC Sun Dec 2 2018
+! Last configuration change at 16:52:14 UTC Thu Dec 6 2018
 !
 version 15.4
 service timestamps debug datetime msec
@@ -202,6 +202,7 @@ router bgp 65534
  address-family ipv4
   network 172.0.0.5 mask 255.255.255.255
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.6 activate
   neighbor 172.0.0.12 activate
@@ -214,6 +215,7 @@ router bgp 65534
  address-family ipv6
   network 2018:ABCD:172::5/128
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.6 activate
   neighbor 172.0.0.12 activate
@@ -225,9 +227,9 @@ router bgp 65534
 !
 !
 virtual-service csr_mgmt
-!
-ip forward-protocol nd
 !         
+ip forward-protocol nd
+!
 no ip http server
 no ip http secure-server
 !
@@ -271,9 +273,9 @@ line vty 0
  login
 line vty 1
  login
- length 0
+ length 0 
 line vty 2 4
- login    
+ login
 !
 !
 end

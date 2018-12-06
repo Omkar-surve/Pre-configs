@@ -1,6 +1,6 @@
-Current configuration : 6911 bytes
+Current configuration : 6883 bytes
 !
-! Last configuration change at 13:50:04 UTC Sun Dec 2 2018
+! Last configuration change at 16:49:34 UTC Thu Dec 6 2018
 !
 version 15.4
 service timestamps debug datetime msec
@@ -199,6 +199,7 @@ router bgp 65534
  address-family ipv4
   network 172.0.0.4 mask 255.255.255.255
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.5 activate
   neighbor 172.0.0.6 activate
   neighbor 172.0.0.12 activate
@@ -220,7 +221,6 @@ router bgp 65534
   neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
-  neighbor CORE_TO_RAN next-hop-self all
   neighbor 172.0.0.22 activate
   neighbor 172.0.0.24 activate
   neighbor 172.0.0.26 activate
@@ -232,6 +232,7 @@ router bgp 65534
  address-family ipv6
   network 2018:ABCD:172::4/128
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.5 activate
   neighbor 172.0.0.6 activate
   neighbor 172.0.0.12 activate
@@ -247,7 +248,6 @@ router bgp 65534
   neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
-  neighbor CORE_TO_RAN next-hop-self all
   neighbor 172.0.0.22 activate
   neighbor 172.0.0.24 activate
   neighbor 172.0.0.26 activate

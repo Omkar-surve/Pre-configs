@@ -1,6 +1,6 @@
-Current configuration : 5676 bytes
+Current configuration : 5730 bytes
 !
-! Last configuration change at 14:01:49 UTC Sun Dec 2 2018
+! Last configuration change at 16:52:22 UTC Thu Dec 6 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -204,6 +204,7 @@ router bgp 65534
  address-family ipv4
   network 172.0.0.12 mask 255.255.255.255
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.5 activate
   neighbor 172.0.0.6 activate
@@ -216,6 +217,7 @@ router bgp 65534
  address-family ipv6
   network 2018:ABCD:172::12/128
   neighbor CORE next-hop-self all
+  neighbor CORE send-label
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.5 activate
   neighbor 172.0.0.6 activate
@@ -225,9 +227,9 @@ router bgp 65534
   neighbor 172.0.0.17 inherit peer-policy AGG_CORE_IBGP_IPv4
  exit-address-family
 !
-!
-virtual-service csr_mgmt
 !         
+virtual-service csr_mgmt
+!
 ip forward-protocol nd
 !
 no ip http server
@@ -271,9 +273,9 @@ control-plane
  !
  !
 !
-!
-!
 !         
+!
+!
 !
 line con 0
  stopbits 1

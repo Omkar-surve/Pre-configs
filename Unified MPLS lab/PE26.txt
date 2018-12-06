@@ -1,6 +1,4 @@
-Current configuration : 4741 bytes
-!
-! Last configuration change at 15:27:12 EET Sun Dec 2 2018
+Current configuration : 4680 bytes
 !
 version 15.5
 service timestamps debug datetime msec
@@ -43,9 +41,9 @@ mmi snmp-timeout 180
 !
 !
 !
+!
+!
 !         
-!
-!
 !
 !
 !
@@ -66,7 +64,7 @@ mpls label range 102600 102699
 !
 !
 !
-!         
+!
 !
 cts logging verbose
 !
@@ -227,9 +225,9 @@ no ip http secure-server
 ipv6 router ospf 1
  router-id 172.0.0.26
  passive-interface Loopback0
+!
+!
 !         
-!
-!
 mpls ldp router-id Loopback0 force
 !
 control-plane
