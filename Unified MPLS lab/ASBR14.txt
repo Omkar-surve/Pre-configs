@@ -1,7 +1,6 @@
-
 Current configuration : 5287 bytes
 !
-! Last configuration change at 15:39:54 EET Sun Dec 2 2018
+! Last configuration change at 08:20:24 EET Sun Dec 9 2018
 !
 version 15.5
 service timestamps debug datetime msec
