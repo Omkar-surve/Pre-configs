@@ -1,5 +1,5 @@
 !! IOS XR Configuration 6.0.1
-!! Last configuration change at Sun Dec  2 13:58:58 2018 by cisco
+!! Last configuration change at Thu Dec 13 15:09:57 2018 by cisco
 !
 hostname AGG-ASBR10
 interface Loopback0
@@ -64,8 +64,20 @@ end-policy
 !
 router static
  address-family ipv4 unicast
+  172.10.11.11/32 GigabitEthernet0/0/0/2
+  172.10.13.13/32 GigabitEthernet0/0/0/3
+  172.10.20.20/32 GigabitEthernet0/0/0/4
+  172.10.21.21/32 GigabitEthernet0/0/0/5
   192.2.10.2/32 GigabitEthernet0/0/0/1
   192.3.10.3/32 GigabitEthernet0/0/0/0
+ !
+ address-family ipv6 unicast
+  2018:abcd:172:2:10::2/128 GigabitEthernet0/0/0/1
+  2018:abcd:172:3:10::3/128 GigabitEthernet0/0/0/0
+  2018:abcd:172:10:11::11/128 GigabitEthernet0/0/0/2
+  2018:abcd:172:10:13::13/128 GigabitEthernet0/0/0/3
+  2018:abcd:172:10:20::20/128 GigabitEthernet0/0/0/4
+  2018:abcd:172:10:21::21/128 GigabitEthernet0/0/0/5
  !
 !
 router isis CORE
@@ -149,10 +161,10 @@ router bgp 65534
  address-family vpnv6 unicast
   retain route-target all
  !
- af-group CORE_IPV4 address-family ipv4 unicast
+ af-group CORE_IPV4_label address-family ipv4 labeled-unicast
   next-hop-self
  !
- af-group CORE_IPV6 address-family ipv6 unicast
+ af-group CORE_IPV6_label address-family ipv6 labeled-unicast
   next-hop-self
  !
  session-group CORE
@@ -200,29 +212,29 @@ router bgp 65534
  !
  neighbor 172.0.0.9
   use session-group CORE
-  address-family ipv4 unicast
-   use af-group CORE_IPV4
+  address-family ipv4 labeled-unicast
+   use af-group CORE_IPV4_label
   !
-  address-family ipv6 unicast
-   use af-group CORE_IPV6
+  address-family ipv6 labeled-unicast
+   use af-group CORE_IPV6_label
   !
  !
  neighbor 172.0.0.11
   use session-group CORE
-  address-family ipv4 unicast
-   use af-group CORE_IPV4
+  address-family ipv4 labeled-unicast
+   use af-group CORE_IPV4_label
   !
-  address-family ipv6 unicast
-   use af-group CORE_IPV6
+  address-family ipv6 labeled-unicast
+   use af-group CORE_IPV6_label
   !
  !
  neighbor 172.0.0.13
   use session-group CORE
-  address-family ipv4 unicast
-   use af-group CORE_IPV4
+  address-family ipv4 labeled-unicast
+   use af-group CORE_IPV4_label
   !
-  address-family ipv6 unicast
-   use af-group CORE_IPV6
+  address-family ipv6 labeled-unicast
+   use af-group CORE_IPV6_label
   !
  !
  neighbor 172.0.0.20

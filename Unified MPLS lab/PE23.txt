@@ -1,5 +1,5 @@
 !! IOS XR Configuration 6.0.1
-!! Last configuration change at Sun Dec  2 14:08:27 2018 by cisco
+!! Last configuration change at Thu Dec 13 15:21:49 2018 by cisco
 !
 hostname PE23
 vrf Client_3
@@ -52,6 +52,16 @@ route-policy eBGP_all
   pass
 end-policy
 !
+router static
+ address-family ipv4 unicast
+  172.20.23.20/32 GigabitEthernet0/0/0/0
+  172.21.23.21/32 GigabitEthernet0/0/0/1
+ !
+ address-family ipv6 unicast
+  2018:abcd:172:20:23::20/128 GigabitEthernet0/0/0/0
+  2018:abcd:172:21:23::21/128 GigabitEthernet0/0/0/1
+ !
+!
 router ospf 1
  router-id 172.0.0.23
  address-family ipv4 unicast
@@ -98,14 +108,22 @@ router bgp 65534
  address-family vpnv6 unicast
   retain route-target all
  !
+ af-group RAN_IPv4 address-family ipv4 unicast
+  next-hop-self
+ !
+ af-group RAN_IPv6 address-family ipv6 unicast
+  next-hop-self
+ !
+ session-group RAN
+  remote-as 65534
+  update-source Loopback0
+ !
  neighbor-group CORE
   remote-as 65534
   update-source Loopback0
   address-family vpnv4 unicast
-   next-hop-self
   !
   address-family vpnv6 unicast
-   next-hop-self
   !
  !
  neighbor-group AGG-CORE
@@ -129,6 +147,15 @@ router bgp 65534
  !
  neighbor 172.0.0.21
   use neighbor-group AGG-CORE
+ !
+ neighbor 172.0.0.29
+  use session-group RAN
+  address-family ipv4 unicast
+   use af-group RAN_IPv4
+  !
+  address-family ipv6 unicast
+   use af-group RAN_IPv6
+  !
  !
  vrf Client_3
   rd 200:200

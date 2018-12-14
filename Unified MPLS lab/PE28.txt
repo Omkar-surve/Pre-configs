@@ -1,6 +1,6 @@
-Current configuration : 4753 bytes
+Current configuration : 4773 bytes
 !
-! Last configuration change at 15:28:45 EET Sun Dec 2 2018
+! Last configuration change at 19:54:21 EET Fri Dec 14 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -182,7 +182,6 @@ router bgp 65534
  !
  address-family vpnv4
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.9 activate
   neighbor 172.0.0.10 activate
  exit-address-family
@@ -199,7 +198,6 @@ router bgp 65534
  !
  address-family vpnv6
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.9 activate
   neighbor 172.0.0.10 activate
  exit-address-family
@@ -209,6 +207,7 @@ router bgp 65534
   neighbor 10.28.34.34 activate
   neighbor 10.28.34.34 send-community extended
   neighbor 10.28.34.34 next-hop-self
+  neighbor 10.28.34.34 as-override
  exit-address-family
  !
  address-family ipv6 vrf Client_2
@@ -216,6 +215,7 @@ router bgp 65534
   neighbor 2018:C2:10:28:34::34 activate
   neighbor 2018:C2:10:28:34::34 send-community extended
   neighbor 2018:C2:10:28:34::34 next-hop-self
+  neighbor 2018:C2:10:28:34::34 as-override
  exit-address-family
 !
 ip forward-protocol nd

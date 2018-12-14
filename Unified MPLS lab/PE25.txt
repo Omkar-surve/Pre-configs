@@ -1,6 +1,4 @@
-Current configuration : 4793 bytes
-!
-! Last configuration change at 13:27:49 UTC Sun Dec 2 2018
+Current configuration : 4672 bytes
 !
 version 15.5
 service timestamps debug datetime msec
@@ -22,7 +20,7 @@ vrf definition Client_3
  !
  address-family ipv4
  exit-address-family
- !
+ !        
  address-family ipv6
  exit-address-family
 !
@@ -43,7 +41,7 @@ no aaa new-model
 
 
 !
-!         
+!
 !
 ipv6 unicast-routing
 !
@@ -66,9 +64,9 @@ multilink bundle-name authenticated
 !
 !
 !
+!
+!
 !         
-!
-!
 !
 license udi pid CSR1000V sn 9DG6XUH02QV
 !
@@ -89,9 +87,9 @@ redundancy
 !
 !
 !
+!
+!
 !         
-!
-!
 !
 !
 !
@@ -158,7 +156,7 @@ router bgp 65534
   send-community extended
   send-label
  exit-peer-policy
- !        
+ !
  template peer-policy AGG-CORE_IBGP_IPv6
   next-hop-self all
   send-community extended
@@ -201,7 +199,6 @@ router bgp 65534
  !
  address-family vpnv4
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.9 activate
   neighbor 172.0.0.10 activate
  exit-address-family
@@ -218,7 +215,6 @@ router bgp 65534
  !
  address-family vpnv6
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.9 activate
   neighbor 172.0.0.10 activate
  exit-address-family
@@ -254,7 +250,7 @@ control-plane
 !
  !
  !
- !
+ !        
  !
 !
 !

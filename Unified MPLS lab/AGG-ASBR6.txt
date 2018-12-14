@@ -1,6 +1,6 @@
-Current configuration : 7146 bytes
+Current configuration : 7229 bytes
 !
-! Last configuration change at 16:52:32 UTC Thu Dec 6 2018
+! Last configuration change at 17:19:39 UTC Fri Dec 14 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -248,6 +248,7 @@ router bgp 65534
   neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
+  neighbor CORE_TO_RAN next-hop-self all
   neighbor 172.0.0.22 activate
   neighbor 172.0.0.24 activate
   neighbor 172.0.0.26 activate
@@ -275,6 +276,7 @@ router bgp 65534
   neighbor S-CORE allowas-in 2
   neighbor CORE_TO_RAN send-community extended
   neighbor CORE_TO_RAN route-reflector-client
+  neighbor CORE_TO_RAN next-hop-self all
   neighbor 172.0.0.22 activate
   neighbor 172.0.0.24 activate
   neighbor 172.0.0.26 activate
@@ -317,9 +319,9 @@ control-plane
  !
 !
 !
-!
-!
 !         
+!
+!
 line con 0
  stopbits 1
 line vty 0

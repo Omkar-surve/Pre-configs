@@ -1,6 +1,7 @@
-Current configuration : 4741 bytes
+
+Current configuration : 4682 bytes
 !
-! Last configuration change at 07:51:38 EET Sun Dec 9 2018
+! Last configuration change at 19:49:38 EET Fri Dec 14 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -182,7 +183,6 @@ router bgp 65534
  !
  address-family vpnv4
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.6 activate
  exit-address-family
@@ -199,7 +199,6 @@ router bgp 65534
  !
  address-family vpnv6
   neighbor CORE send-community extended
-  neighbor CORE next-hop-self
   neighbor 172.0.0.4 activate
   neighbor 172.0.0.6 activate
  exit-address-family
@@ -227,9 +226,9 @@ no ip http secure-server
 ipv6 router ospf 1
  router-id 172.0.0.26
  passive-interface Loopback0
+!
+!
 !         
-!
-!
 mpls ldp router-id Loopback0 force
 !
 control-plane
