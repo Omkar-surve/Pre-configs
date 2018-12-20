@@ -1,0 +1,367 @@
+
+!
+! Last configuration change at 19:27:28 EET Thu Dec 20 2018
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname PE14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition M
+ rd 1:1
+ route-target export 1:1
+ route-target import 1:1
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition N
+ rd 2:2
+ route-target export 2:2
+ route-target import 2:2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition O
+ rd 3:3
+ route-target export 3:3
+ route-target import 3:3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+ipv6 rip vrf-mode enable
+!
+multilink bundle-name authenticated
+mpls label range 414000 414999
+mpls ldp advertise-labels for loopback
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 40.0.0.14 255.255.255.255
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:40::14/128
+ ospfv3 network point-to-point
+ ospfv3 40 ipv6 area 0
+ ospfv3 40 ipv4 area 0
+!
+interface Ethernet0/0
+ no shutdown
+ description towards RR27 e0/2
+ ip address 40.14.27.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:40:14:27::14/112
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
+!
+interface Ethernet0/1
+ no shutdown
+ description towards PE15 e0/1
+ ip address 40.14.15.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:40:14:15::14/112
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
+!
+interface Ethernet0/2
+ no shutdown
+ description towards PE16 e0/2
+ ip address 40.14.16.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:40:14:16::14/112
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
+!
+interface Ethernet0/3
+ no shutdown
+ description towards PE7 e0/2
+ ip address 198.7.14.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:198:7:14::14/112
+!
+interface Ethernet0/3.1
+ no shutdown
+ description RIP Client
+ encapsulation dot1Q 4
+ vrf forwarding M
+ ip address 27.7.14.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:27:7:14::14/112
+!
+interface Ethernet0/3.2
+ no shutdown
+ description EIGRP Client
+ encapsulation dot1Q 2
+ vrf forwarding N
+ ip address 107.7.14.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:107:7:14::14/112
+!
+interface Ethernet0/3.3
+ no shutdown
+ description OSPF Client
+ encapsulation dot1Q 3
+ vrf forwarding O
+ ip address 207.7.14.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:207:7:14::14/112
+!
+interface Ethernet1/0
+ no shutdown
+ no ip address
+!
+interface Ethernet1/0.1
+ no shutdown
+ description towards CE31
+ encapsulation dot1Q 2
+ vrf forwarding M
+ ip address 2.14.31.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:2:14:31::14/112
+ ipv6 rip 2 enable
+!
+interface Ethernet1/0.2
+ no shutdown
+ description towards CE22
+ encapsulation dot1Q 3
+ vrf forwarding O
+ ip address 200.14.22.14 255.255.255.0
+ ipv6 address FE80::14 link-local
+ ipv6 address 2012:200:14:22::14/112
+!
+interface Ethernet1/1
+ no shutdown
+ ip address dhcp
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+router ospfv3 40
+ !
+ address-family ipv4 unicast
+  router-id 40.0.0.14
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  router-id 40.0.0.14
+ exit-address-family
+!
+router rip
+ version 2
+ !
+ address-family ipv4 vrf M
+  redistribute bgp 40 metric 2
+  network 2.0.0.0
+  no auto-summary
+  version 2
+ exit-address-family
+!
+router bgp 40
+ bgp router-id 40.0.0.14
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR peer-group
+ neighbor RR remote-as 40
+ neighbor RR update-source Loopback0
+ neighbor 40.0.0.27 peer-group RR
+ !
+ address-family ipv4
+  redistribute rip
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR send-community both
+  neighbor 40.0.0.27 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR send-community both
+  neighbor 40.0.0.27 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf M
+  redistribute connected
+  redistribute rip metric 2
+  neighbor 27.7.14.7 remote-as 90
+  neighbor 27.7.14.7 activate
+  neighbor 27.7.14.7 send-community both
+  neighbor 27.7.14.7 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf M
+  redistribute connected
+  redistribute rip 2 metric 2
+  neighbor 2012:27:7:14::7 remote-as 90
+  neighbor 2012:27:7:14::7 activate
+  neighbor 2012:27:7:14::7 send-community both
+  neighbor 2012:27:7:14::7 next-hop-self
+ exit-address-family
+ !
+ address-family ipv4 vrf N
+  redistribute connected
+  neighbor 107.7.14.7 remote-as 90
+  neighbor 107.7.14.7 activate
+  neighbor 107.7.14.7 send-community both
+  neighbor 107.7.14.7 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf N
+  redistribute connected
+  neighbor 2012:107:7:14::7 remote-as 90
+  neighbor 2012:107:7:14::7 activate
+  neighbor 2012:107:7:14::7 send-community both
+  neighbor 2012:107:7:14::7 next-hop-self
+ exit-address-family
+ !
+ address-family ipv4 vrf O
+  redistribute connected
+  neighbor 200.14.22.22 remote-as 200
+  neighbor 200.14.22.22 activate
+  neighbor 200.14.22.22 send-community both
+  neighbor 200.14.22.22 next-hop-self
+  neighbor 207.7.14.7 remote-as 90
+  neighbor 207.7.14.7 activate
+  neighbor 207.7.14.7 send-community both
+  neighbor 207.7.14.7 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf O
+  redistribute connected
+  neighbor 2012:207:7:14::7 remote-as 90
+  neighbor 2012:207:7:14::7 activate
+  neighbor 2012:207:7:14::7 send-community both
+  neighbor 2012:207:7:14::7 next-hop-self
+  neighbor 200.14.22.22 remote-as 200
+  neighbor 200.14.22.22 activate
+  neighbor 200.14.22.22 send-community both
+  neighbor 200.14.22.22 next-hop-self
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard loopback
+ permit 40.0.0.0 0.0.0.255
+!
+ipv6 router rip 2
+ !
+ address-family ipv6 vrf M
+  redistribute bgp 40 metric 2
+ exit-address-family
+!
+!
+!
+mpls ldp router-id Loopback0
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+ntp server pnpntpserver.localdomain
+!
+end

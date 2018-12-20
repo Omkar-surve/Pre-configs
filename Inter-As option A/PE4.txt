@@ -1,0 +1,232 @@
+!! IOS XR Configuration 6.0.1
+!! Last configuration change at Thu Dec 20 16:51:04 2018 by cisco
+!
+hostname PE4
+vrf M
+ address-family ipv4 unicast
+  import route-target
+   1:1
+  !
+  export route-target
+   1:1
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   1:1
+  !
+  export route-target
+   1:1
+  !
+ !
+!
+vrf N
+ address-family ipv4 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+!
+vrf O
+ address-family ipv4 unicast
+  import route-target
+   3:3
+  !
+  export route-target
+   3:3
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   3:3
+  !
+  export route-target
+   3:3
+  !
+ !
+!
+interface Loopback0
+ description towards Mgmt
+ ipv4 address 90.0.0.4 255.255.255.255
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90::4/128
+!
+interface MgmtEth0/0/CPU0/0
+ ipv4 address dhcp
+!
+interface GigabitEthernet0/0/0/0
+ description towards RR6 e0/1
+ ipv4 address 90.4.6.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90:4:6::4/112
+!
+interface GigabitEthernet0/0/0/1
+ description towards PE1 gi0/0/0/1
+ ipv4 address 90.1.4.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90:1:4::4/112
+!
+interface GigabitEthernet0/0/0/2
+ description towards PE8 gi3
+ ipv4 address 199.4.8.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:199:4:8::4/112
+!
+interface GigabitEthernet0/0/0/2.2
+ description EIGRP Client
+ vrf N
+ ipv4 address 108.4.8.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:108:4:8::4/112
+ encapsulation dot1q 2
+!
+interface GigabitEthernet0/0/0/2.3
+ description OSPF Client
+ vrf O
+ ipv4 address 208.4.8.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:208:4:8::4/112
+ encapsulation dot1q 3
+!
+interface preconfigure GigabitEthernet0/0/0/3
+ shutdown
+!
+interface preconfigure GigabitEthernet0/0/0/4
+ shutdown
+!
+route-policy pass
+  pass
+end-policy
+!
+router isis 90
+ is-type level-2-only
+ net 49.0090.0000.0004.00
+ address-family ipv4 unicast
+  metric-style wide
+  mpls ldp auto-config
+ !
+ address-family ipv6 unicast
+  metric-style wide
+ !
+ interface Loopback0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/1
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+!
+router bgp 90
+ bgp router-id 90.0.0.4
+ address-family ipv4 unicast
+ !
+ address-family vpnv4 unicast
+  retain route-target all
+ !
+ address-family ipv6 unicast
+ !
+ address-family vpnv6 unicast
+  retain route-target all
+ !
+ neighbor-group RRs
+  remote-as 90
+  update-source Loopback0
+  address-family vpnv4 unicast
+  !
+  address-family vpnv6 unicast
+  !
+ !
+ neighbor 90.0.0.5
+  use neighbor-group RRs
+ !
+ neighbor 90.0.0.6
+  use neighbor-group RRs
+ !
+ vrf N
+  rd 2:2
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+  neighbor 108.4.8.8
+   remote-as 50
+   address-family ipv4 unicast
+    send-community-ebgp
+    route-policy pass in
+    route-policy pass out
+    next-hop-self
+   !
+  !
+  neighbor 2012:108:4:8::8
+   remote-as 50
+   address-family ipv6 unicast
+    send-community-ebgp
+    route-policy pass in
+    route-policy pass out
+    next-hop-self
+   !
+  !
+ !
+ vrf O
+  rd 3:3
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+  neighbor 208.4.8.8
+   remote-as 50
+   address-family ipv4 unicast
+    send-community-ebgp
+    route-policy pass in
+    route-policy pass out
+    next-hop-self
+   !
+  !
+  neighbor 2012:208:4:8::8
+   remote-as 50
+   address-family ipv6 unicast
+    send-community-ebgp
+    route-policy pass in
+    route-policy pass out
+    next-hop-self
+   !
+  !
+ !
+!
+mpls ldp
+ router-id 90.0.0.4
+ address-family ipv4
+  label
+   local
+    allocate for host-routes
+   !
+  !
+ !
+!
+mpls label range table 0 94000 94999
+end
