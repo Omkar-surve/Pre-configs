@@ -1,5 +1,5 @@
 !
-! Last configuration change at 18:20:07 UTC Thu Dec 20 2018
+! Last configuration change at 16:43:44 UTC Fri Dec 21 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -41,6 +41,7 @@ no process cpu autoprofile hog
 
 
 
+ip domain name DN.com
 !
 !
 !
@@ -74,6 +75,8 @@ license udi pid CSR1000V sn 9EKYI21F5OC
 !
 spanning-tree extend system-id
 !
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
 !
 redundancy
 !
@@ -242,12 +245,15 @@ line con 0
  exec-timeout 0 0
  stopbits 1
 line vty 0
- login
+ login local
+ transport input ssh
 line vty 1
- login
+ login local
  length 0
+ transport input ssh
 line vty 2 4
- login
+ login local
+ transport input ssh
 !
 !
 end

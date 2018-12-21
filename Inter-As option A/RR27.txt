@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 19:32:49 EET Thu Dec 20 2018
+! Last configuration change at 18:45:48 EET Fri Dec 21 2018
 !
 version 15.5
 service timestamps debug datetime msec
@@ -43,6 +43,7 @@ mmi snmp-timeout 180
 !
 !
 !
+ip domain name DN.com
 ip cef
 ipv6 unicast-routing
 ipv6 cef
@@ -60,6 +61,8 @@ mpls ldp advertise-labels for loopback
 cts logging verbose
 !
 !
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
 !
 redundancy
 !
@@ -84,8 +87,8 @@ interface Loopback0
  ipv6 address FE80::27 link-local
  ipv6 address 2012:40::27/127
  ospfv3 network point-to-point
- ospfv3 40 ipv6 area 0
  ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
 !
 interface Ethernet0/0
  no shutdown
@@ -95,8 +98,8 @@ interface Ethernet0/0
  ipv6 address 2012:40:14:27::27/112
  mpls ip
  ospfv3 network point-to-point
- ospfv3 40 ipv6 area 0
  ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
 !
 interface Ethernet0/1
  no shutdown
@@ -106,8 +109,8 @@ interface Ethernet0/1
  ipv6 address 2012:40:16:27::27/112
  mpls ip
  ospfv3 network point-to-point
- ospfv3 40 ipv6 area 0
  ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
 !
 interface Ethernet0/2
  no shutdown
@@ -117,8 +120,8 @@ interface Ethernet0/2
  ipv6 address 2012:40:17:27::27/112
  mpls ip
  ospfv3 network point-to-point
- ospfv3 40 ipv6 area 0
  ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
 !
 interface Ethernet0/3
  no shutdown
@@ -128,8 +131,8 @@ interface Ethernet0/3
  ipv6 address 2012:40:15:27::27/112
  mpls ip
  ospfv3 network point-to-point
- ospfv3 40 ipv6 area 0
  ospfv3 40 ipv4 area 0
+ ospfv3 40 ipv6 area 0
 !
 interface Ethernet1/0
  no shutdown
@@ -220,8 +223,8 @@ line con 0
  logging synchronous
 line aux 0
 line vty 0 4
- login
- transport input none
+ login local
+ transport input ssh
 !
 ntp server pnpntpserver.localdomain
 !

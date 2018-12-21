@@ -1,6 +1,6 @@
 
 !
-! Last configuration change at 17:00:07 EET Thu Dec 20 2018
+! Last configuration change at 18:38:24 EET Fri Dec 21 2018
 !
 version 15.5
 service config
@@ -44,6 +44,7 @@ mmi snmp-timeout 180
 !
 !
 !
+ip domain name DN.com
 ip cef
 ipv6 unicast-routing
 ipv6 cef
@@ -59,6 +60,8 @@ multilink bundle-name authenticated
 cts logging verbose
 !
 !
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
 !
 redundancy
 !
@@ -135,8 +138,8 @@ line con 0
  logging synchronous
 line aux 0
 line vty 0 4
- login
- transport input none
+ login local
+ transport input ssh
 !
 ntp server pnpntpserver.localdomain
 !

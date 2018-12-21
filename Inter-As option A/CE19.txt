@@ -1,9 +1,8 @@
 
 !
-! Last configuration change at 17:00:26 EET Thu Dec 20 2018
+! Last configuration change at 18:27:54 EET Fri Dec 21 2018 by omkar
 !
 version 15.5
-service config
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
@@ -14,6 +13,7 @@ boot-start-marker
 boot-end-marker
 !
 !
+enable password cisco
 !
 no aaa new-model
 !
@@ -44,6 +44,7 @@ mmi snmp-timeout 180
 !
 !
 !
+ip domain name DN.com
 ip cef
 ipv6 unicast-routing
 ipv6 cef
@@ -59,6 +60,8 @@ multilink bundle-name authenticated
 cts logging verbose
 !
 !
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
 !
 redundancy
 !
@@ -147,8 +150,8 @@ line con 0
  logging synchronous
 line aux 0
 line vty 0 4
- login
- transport input none
+ login local
+ transport input ssh
 !
 ntp server pnpntpserver.localdomain
 !
