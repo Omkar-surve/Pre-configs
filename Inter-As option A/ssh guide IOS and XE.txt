@@ -1,0 +1,24 @@
+IOS / XE ssh 
+NOTE: when only one username configured. ssh doesn't work as expected. So configured two username and latest one is privileged.
+SSH steps:
+1) complete basic settings like hostname, domain-name, username and password
+2) configure line vty lines
+3} configure crypto rsa
+
+hostname CE19
+!
+!
+enable password cisco
+!
+!
+ip domain name DN.com
+!
+crypto key generate rsa 
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
