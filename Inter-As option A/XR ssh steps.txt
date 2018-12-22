@@ -1,0 +1,17 @@
+XR SSH steps:
+
+Under privileged mode:
+crypto key generate rsa
+
+Under global config mode:
+hostname PE1
+!
+ipv4 access-list SSH_ALLOWED
+ 10 permit ipv4 10.0.0.0/24 any
+!
+domain name DN.com
+!
+ssh server v2
+ssh server vrf default ipv4 access-list SSH_ALLOWED
+ssh timeout 120
+!
