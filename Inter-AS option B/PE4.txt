@@ -1,0 +1,197 @@
+!! IOS XR Configuration 6.0.1
+!! Last configuration change at Sun Dec 23 18:29:09 2018 by cisco
+!
+hostname PE4
+domain name DN.com
+vrf M
+ address-family ipv4 unicast
+  import route-target
+   1:1
+  !
+  export route-target
+   1:1
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   1:1
+  !
+  export route-target
+   1:1
+  !
+ !
+!
+vrf N
+ address-family ipv4 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+!
+vrf O
+ address-family ipv4 unicast
+  import route-target
+   3:3
+  !
+  export route-target
+   3:3
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   3:3
+  !
+  export route-target
+   3:3
+  !
+ !
+!
+ipv4 access-list SSH_ALLOWED
+ 10 permit ipv4 10.0.0.0/24 any
+!
+interface Loopback0
+ description towards Mgmt
+ ipv4 address 90.0.0.4 255.255.255.255
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90::4/128
+!
+interface MgmtEth0/0/CPU0/0
+ ipv4 address dhcp
+!
+interface GigabitEthernet0/0/0/0
+ description towards RR6 e0/1
+ ipv4 address 90.4.6.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90:4:6::4/112
+!
+interface GigabitEthernet0/0/0/1
+ description towards PE1 gi0/0/0/1
+ ipv4 address 90.1.4.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:90:1:4::4/112
+!
+interface GigabitEthernet0/0/0/2
+ description towards PE8 gi3
+ ipv4 address 199.4.8.4 255.255.255.0
+ ipv6 address fe80::4 link-local
+ ipv6 address 2012:199:4:8::4/112
+!
+interface preconfigure GigabitEthernet0/0/0/3
+ shutdown
+!
+interface preconfigure GigabitEthernet0/0/0/4
+ shutdown
+!
+route-policy pass
+  pass
+end-policy
+!
+router static
+ address-family ipv4 unicast
+  199.4.8.8/32 GigabitEthernet0/0/0/2
+  199.4.8.8/32 GigabitEthernet0/0/0/2 199.4.8.8
+ !
+ address-family ipv6 unicast
+  2012:199:4:8::8/128 GigabitEthernet0/0/0/2
+ !
+!
+router isis 90
+ is-type level-2-only
+ net 49.0090.0000.0004.00
+ address-family ipv4 unicast
+  metric-style wide
+  mpls ldp auto-config
+ !
+ address-family ipv6 unicast
+  metric-style wide
+ !
+ interface Loopback0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/1
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+!
+router bgp 90
+ bgp router-id 90.0.0.4
+ address-family ipv4 unicast
+ !
+ address-family vpnv4 unicast
+  retain route-target all
+ !
+ address-family ipv6 unicast
+ !
+ address-family vpnv6 unicast
+  retain route-target all
+ !
+ neighbor-group RRs
+  remote-as 90
+  update-source Loopback0
+  address-family vpnv4 unicast
+   next-hop-self
+  !
+  address-family vpnv6 unicast
+   next-hop-self
+  !
+ !
+ neighbor 90.0.0.5
+  use neighbor-group RRs
+ !
+ neighbor 90.0.0.6
+  use neighbor-group RRs
+ !
+ neighbor 199.4.8.8
+  remote-as 50
+  address-family vpnv4 unicast
+   route-policy pass in
+   route-policy pass out
+   next-hop-self
+  !
+  address-family vpnv6 unicast
+   route-policy pass in
+   route-policy pass out
+   next-hop-self
+  !
+ !
+!
+mpls ldp
+ router-id 90.0.0.4
+ address-family ipv4
+  label
+   local
+    allocate for host-routes
+   !
+  !
+ !
+!
+mpls label range table 0 94000 94999
+ssh server v2
+ssh server vrf default ipv4 access-list SSH_ALLOWED
+ssh timeout 120
+end

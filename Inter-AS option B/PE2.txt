@@ -1,0 +1,174 @@
+!! IOS XR Configuration 6.0.1
+!! Last configuration change at Sun Dec 23 18:29:05 2018 by cisco
+!
+hostname PE2
+domain name DN.com
+vrf N
+ address-family ipv4 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+ address-family ipv6 unicast
+  import route-target
+   2:2
+  !
+  export route-target
+   2:2
+  !
+ !
+!
+ipv4 access-list SSH_ALLOWED
+ 10 permit ipv4 10.0.0.0/24 any
+!
+interface Loopback0
+ description towards Mgmt
+ ipv4 address 90.0.0.2 255.255.255.255
+ ipv6 address fe80::2 link-local
+ ipv6 address 2012:90::2/128
+!
+interface MgmtEth0/0/CPU0/0
+ ipv4 address dhcp
+!
+interface GigabitEthernet0/0/0/0
+ description towards RR5 e0/1
+ ipv4 address 90.2.5.2 255.255.255.0
+ ipv6 address fe80::2 link-local
+ ipv6 address 2012:90:2:5::2/112
+!
+interface GigabitEthernet0/0/0/1
+ description towards PE1 gi0/0/0/1
+ ipv4 address 90.1.2.2 255.255.255.0
+ ipv6 address fe80::2 link-local
+ ipv6 address 2012:90:1:2::2/112
+!
+interface GigabitEthernet0/0/0/2
+ description towards PE3 gi0/0/0/1
+ ipv4 address 90.2.3.2 255.255.255.0
+ ipv6 address fe80::2 link-local
+ ipv6 address 2012:90:2:3::2/112
+!
+interface GigabitEthernet0/0/0/3
+ description towards CE19
+ vrf N
+ ipv4 address 100.2.19.2 255.255.255.0
+ ipv6 address fe80::2 link-local
+ ipv6 address 2012:100:2:19::2/112
+!
+interface GigabitEthernet0/0/0/4
+ shutdown
+!
+router isis 90
+ is-type level-2-only
+ net 49.0090.0000.0002.00
+ address-family ipv4 unicast
+  metric-style wide
+  mpls ldp auto-config
+ !
+ address-family ipv6 unicast
+  metric-style wide
+ !
+ interface Loopback0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/0
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/1
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+ interface GigabitEthernet0/0/0/2
+  point-to-point
+  address-family ipv4 unicast
+  !
+  address-family ipv6 unicast
+  !
+ !
+!
+router bgp 90
+ bgp router-id 90.0.0.2
+ address-family ipv4 unicast
+ !
+ address-family vpnv4 unicast
+ !
+ address-family ipv6 unicast
+ !
+ address-family vpnv6 unicast
+ !
+ neighbor-group RRs
+  remote-as 90
+  update-source Loopback0
+  address-family vpnv4 unicast
+  !
+  address-family vpnv6 unicast
+  !
+ !
+ neighbor 90.0.0.5
+  use neighbor-group RRs
+ !
+ neighbor 90.0.0.6
+  use neighbor-group RRs
+ !
+ vrf N
+  rd 2:2
+  address-family ipv4 unicast
+   redistribute eigrp 100 match internal external
+  !
+  address-family ipv6 unicast
+   redistribute eigrp 100 match internal external
+  !
+ !
+!
+mpls ldp
+ router-id 90.0.0.2
+ address-family ipv4
+  label
+   local
+    allocate for host-routes
+   !
+  !
+ !
+!
+mpls label range table 0 92000 92999
+router eigrp 100
+ vrf N
+  address-family ipv4
+   router-id 100.0.0.2
+   default-metric 1 1 1 1 1
+   log-neighbor-changes
+   autonomous-system 100
+   redistribute bgp 90
+   interface GigabitEthernet0/0/0/3
+   !
+  !
+  address-family ipv6
+   router-id 100.0.0.2
+   default-metric 1 1 1 1 1
+   log-neighbor-changes
+   autonomous-system 100
+   redistribute bgp 90
+   interface GigabitEthernet0/0/0/3
+    neighbor fe80::19
+   !
+  !
+ !
+!
+ssh server v2
+ssh server vrf default ipv4 access-list SSH_ALLOWED
+ssh timeout 120
+end

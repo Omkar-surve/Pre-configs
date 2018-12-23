@@ -1,0 +1,303 @@
+!
+! Last configuration change at 18:39:36 UTC Sun Dec 23 2018
+!
+version 15.5
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname PE13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition N
+ rd 2:2
+ route-target export 2:2
+ route-target import 2:2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition O
+ rd 3:3
+ route-target export 3:3
+ route-target import 3:3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+no aaa new-model
+no process cpu autoprofile hog
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+ip domain name DN.com
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 513000 513999
+mpls ldp advertise-labels for loopback
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9KL3L12WHFS
+!
+spanning-tree extend system-id
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 50.0.0.13 255.255.255.255
+ ip router isis 50
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:50::13/128
+ ipv6 router isis 50
+!
+interface GigabitEthernet1
+ no shutdown
+ description towards RR28 e0/3
+ ip address 50.13.28.13 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:50:13:28::13/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet2
+ no shutdown
+ description towards PE8 gi2
+ ip address 50.8.13.13 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:50:8:13::13/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet3
+ no shutdown
+ description towards PE15 e0/3
+ ip address 198.13.15.13 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:198:13:15::13/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet3.2
+ no shutdown
+ description EIGRP Client
+ encapsulation dot1Q 2
+ vrf forwarding N
+ ip address 108.13.15.13 255.255.255.0
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:108:13:15::13/112
+!
+interface GigabitEthernet3.3
+ no shutdown
+ description OSPF Client
+ encapsulation dot1Q 3
+ vrf forwarding O
+ ip address 208.13.15.13 255.255.255.0
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:208:13:15::13/112
+!
+interface GigabitEthernet4
+ no shutdown
+ description towards PE7 e0/3
+ ip address 199.7.13.13 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:199:7:13::13/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet4.2
+ no shutdown
+ description EIGRP Client
+ encapsulation dot1Q 2
+ vrf forwarding N
+ ip address 108.7.13.13 255.255.255.0
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:108:7:13::13/112
+!
+interface GigabitEthernet4.3
+ no shutdown
+ description OSPF Client
+ encapsulation dot1Q 3
+ vrf forwarding O
+ ip address 208.7.13.13 255.255.255.0
+ ipv6 address FE80::13 link-local
+ ipv6 address 2012:208:7:13::13/112
+!
+interface GigabitEthernet5
+ no shutdown
+ ip address dhcp
+ negotiation auto
+!
+router isis 50
+ net 49.0050.0000.0013.00
+ is-type level-2-only
+ metric-style wide
+ !
+ address-family ipv6
+  multi-topology
+ exit-address-family
+ mpls ldp autoconfig level-2
+!
+router bgp 50
+ bgp router-id 50.0.0.13
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR peer-group
+ neighbor RR remote-as 50
+ neighbor RR update-source Loopback0
+ neighbor 50.0.0.28 peer-group RR
+ neighbor 198.13.15.15 remote-as 40
+ neighbor 199.7.13.7 remote-as 90
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR send-community both
+  neighbor RR next-hop-self
+  neighbor 50.0.0.28 activate
+  neighbor 198.13.15.15 activate
+  neighbor 198.13.15.15 send-community both
+  neighbor 198.13.15.15 next-hop-self
+  neighbor 199.7.13.7 activate
+  neighbor 199.7.13.7 send-community both
+  neighbor 199.7.13.7 next-hop-self
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR send-community both
+  neighbor RR next-hop-self
+  neighbor 50.0.0.28 activate
+  neighbor 198.13.15.15 activate
+  neighbor 198.13.15.15 send-community both
+  neighbor 198.13.15.15 next-hop-self
+  neighbor 199.7.13.7 activate
+  neighbor 199.7.13.7 send-community both
+  neighbor 199.7.13.7 next-hop-self
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet5
+!
+ip access-list standard loopback
+ permit 50.0.0.0 0.0.0.255
+!
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ login local
+ transport input ssh
+line vty 1
+ login local
+ length 0
+ transport input ssh
+line vty 2 4
+ login local
+ transport input ssh
+!
+!
+end
