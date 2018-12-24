@@ -1,0 +1,255 @@
+
+!
+! Last configuration change at 08:04:35 EET Mon Dec 24 2018
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname RR28
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password cisco
+!
+no aaa new-model
+!
+!
+!
+bsd-client server url https://cloudsso.cisco.com/as/token.oauth2
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip domain name DN.com
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+mpls label range 528000 528999
+mpls ldp advertise-labels for loopback
+!
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 50.0.0.28 255.255.255.255
+ ip router isis 50
+ ipv6 address FE80::28 link-local
+ ipv6 address 2012:50::28/128
+ ipv6 router isis 50
+!
+interface Ethernet0/0
+ no shutdown
+ description towards PE12 gi1
+ ip address 50.12.28.28 255.255.255.0
+ ip router isis 50
+ ipv6 address FE80::28 link-local
+ ipv6 address 2012:50:12:28::28/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface Ethernet0/1
+ no shutdown
+ description towards PE11 gi1
+ ip address 50.11.28.28 255.255.255.0
+ ip router isis 50
+ ipv6 address FE80::28 link-local
+ ipv6 address 2012:50:11:28::28/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface Ethernet0/2
+ no shutdown
+ description towards PE8 gi1
+ ip address 50.8.28.28 255.255.255.0
+ ip router isis 50
+ ipv6 address FE80::28 link-local
+ ipv6 address 2012:50:8:28::28/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface Ethernet0/3
+ no shutdown
+ description towards PE13 gi1
+ ip address 50.13.28.28 255.255.255.0
+ ip router isis 50
+ ipv6 address FE80::28 link-local
+ ipv6 address 2012:50:13:28::28/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface Ethernet1/0
+ no shutdown
+ ip address dhcp
+!
+interface Ethernet1/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no shutdown
+ no ip address
+ shutdown
+!
+router isis 50
+ mpls ldp autoconfig level-2
+ net 49.0050.0000.0028.00
+ is-type level-2-only
+ metric-style wide
+ !
+ address-family ipv6
+  multi-topology
+ exit-address-family
+!
+router bgp 50
+ bgp router-id 50.0.0.28
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR_client peer-group
+ neighbor RR_client remote-as 50
+ neighbor RR_client update-source Loopback0
+ neighbor 40.0.0.16 remote-as 40
+ neighbor 40.0.0.16 ebgp-multihop 10
+ neighbor 40.0.0.16 update-source Loopback0
+ neighbor 40.0.0.17 remote-as 40
+ neighbor 40.0.0.17 ebgp-multihop 10
+ neighbor 40.0.0.17 update-source Loopback0
+ neighbor 50.0.0.8 peer-group RR_client
+ neighbor 50.0.0.9 peer-group RR_client
+ neighbor 50.0.0.10 peer-group RR_client
+ neighbor 50.0.0.11 peer-group RR_client
+ neighbor 50.0.0.12 peer-group RR_client
+ neighbor 50.0.0.13 peer-group RR_client
+ neighbor 90.0.0.5 remote-as 90
+ neighbor 90.0.0.5 ebgp-multihop 10
+ neighbor 90.0.0.5 update-source Loopback0
+ neighbor 90.0.0.6 remote-as 90
+ neighbor 90.0.0.6 ebgp-multihop 10
+ neighbor 90.0.0.6 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR_client send-community both
+  neighbor RR_client route-reflector-client
+  neighbor RR_client next-hop-self
+  neighbor 40.0.0.16 activate
+  neighbor 40.0.0.16 send-community both
+  neighbor 40.0.0.17 activate
+  neighbor 40.0.0.17 send-community both
+  neighbor 50.0.0.8 activate
+  neighbor 50.0.0.9 activate
+  neighbor 50.0.0.10 activate
+  neighbor 50.0.0.11 activate
+  neighbor 50.0.0.12 activate
+  neighbor 50.0.0.13 activate
+  neighbor 90.0.0.5 activate
+  neighbor 90.0.0.5 send-community both
+  neighbor 90.0.0.6 activate
+  neighbor 90.0.0.6 send-community both
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR_client send-community both
+  neighbor RR_client route-reflector-client
+  neighbor RR_client next-hop-self
+  neighbor 50.0.0.8 activate
+  neighbor 50.0.0.9 activate
+  neighbor 50.0.0.10 activate
+  neighbor 50.0.0.11 activate
+  neighbor 50.0.0.12 activate
+  neighbor 50.0.0.13 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard loopback
+ permit 50.0.0.0 0.0.0.255
+!
+!
+!
+mpls ldp router-id Loopback0
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+!
+ntp server pnpntpserver.localdomain
+!
+end

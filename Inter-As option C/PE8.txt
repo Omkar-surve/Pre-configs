@@ -1,0 +1,294 @@
+!
+! Last configuration change at 06:01:15 UTC Mon Dec 24 2018
+!
+version 15.5
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname PE8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition N
+ rd 2:2
+ route-target export 2:2
+ route-target import 2:2
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition O
+ rd 3:3
+ route-target export 3:3
+ route-target import 3:3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+no aaa new-model
+no process cpu autoprofile hog
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+ip domain name DN.com
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 58000 58999
+mpls ldp advertise-labels for loopback
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9IG0H08KDRN
+!
+spanning-tree extend system-id
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 50.0.0.8 255.255.255.255
+ ip router isis 50
+ ipv6 address FE80::8 link-local
+ ipv6 address 2012:50::8/128
+ ipv6 router isis 50
+!
+interface GigabitEthernet1
+ no shutdown
+ description towards RR28 e0/2
+ ip address 50.8.28.8 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::8 link-local
+ ipv6 address 2012:50:8:28::8/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet2
+ no shutdown
+ description towards PE13 gi2
+ ip address 50.8.13.8 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::8 link-local
+ ipv6 address 2012:50:8:13::8/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet3
+ no shutdown
+ description towards PE4 gi0/0/0/2
+ ip address 199.4.8.8 255.255.255.0
+ negotiation auto
+ ipv6 address FE80::8 link-local
+ ipv6 address 2012:199:4:8::8/112
+ mpls bgp forwarding
+!
+interface GigabitEthernet4
+ no shutdown
+ description towards PE12 gi5
+ ip address 50.8.12.8 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::8 link-local
+ ipv6 address 2012:50:8:12::8/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet5
+ no shutdown
+ ip address dhcp
+ negotiation auto
+!
+router isis 50
+ net 49.0050.0000.0008.00
+ is-type level-2-only
+ metric-style wide
+ redistribute bgp 50 route-map PE_RR_Lo0_advertise
+ !
+ address-family ipv6
+  multi-topology
+  redistribute bgp 50 route-map PE_RR_Lo0_advertise
+ exit-address-family
+ mpls ldp autoconfig
+!
+router bgp 50
+ bgp router-id 50.0.0.8
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR peer-group
+ neighbor RR remote-as 50
+ neighbor RR update-source Loopback0
+ neighbor 50.0.0.13 remote-as 50
+ neighbor 50.0.0.13 update-source Loopback0
+ neighbor 50.0.0.28 peer-group RR
+ neighbor 199.4.8.4 remote-as 90
+ !
+ address-family ipv4
+  bgp redistribute-internal
+  network 50.0.0.9 mask 255.255.255.255
+  network 50.0.0.10 mask 255.255.255.255
+  network 50.0.0.28 mask 255.255.255.255
+  neighbor 50.0.0.13 activate
+  neighbor 50.0.0.13 next-hop-self
+  neighbor 199.4.8.4 activate
+  neighbor 199.4.8.4 send-community both
+  neighbor 199.4.8.4 next-hop-self
+  neighbor 199.4.8.4 send-label
+  maximum-paths eibgp 2
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR send-community both
+  neighbor RR next-hop-self
+  neighbor 50.0.0.28 activate
+ exit-address-family
+ !
+ address-family ipv6
+  maximum-paths eibgp 2
+  neighbor 50.0.0.13 activate
+  neighbor 50.0.0.13 next-hop-self
+  neighbor 199.4.8.4 activate
+  neighbor 199.4.8.4 send-community both
+  neighbor 199.4.8.4 next-hop-self
+  neighbor 199.4.8.4 send-label
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR send-community both
+  neighbor RR next-hop-self
+  neighbor 50.0.0.28 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet5
+!
+ip access-list standard advertise_PE_lo0
+ permit 50.0.0.10
+ permit 50.0.0.9
+ deny   any
+ip access-list standard loopback
+ permit 50.0.0.0 0.0.0.255
+!
+!
+ip prefix-list PE_RR_Lo0_advertise seq 5 permit 90.0.0.0/32
+ip prefix-list PE_RR_Lo0_advertise seq 10 permit 40.0.0.0/32
+ip prefix-list PE_RR_Lo0_advertise seq 15 permit 50.0.0.0/32
+!
+route-map PE_RR_Lo0_advertise permit 10
+ match ip address prefix-list PE_RR_Lo0_advertise
+!
+route-map PE_RR_Lo0_advertise permit 20
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ login local
+ transport input ssh
+line vty 1
+ login local
+ length 0
+ transport input ssh
+line vty 2 4
+ login local
+ transport input ssh
+!
+!
+end

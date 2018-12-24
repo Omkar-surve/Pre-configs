@@ -1,0 +1,230 @@
+!
+! Last configuration change at 06:00:20 UTC Mon Dec 24 2018
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname PE10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition O
+ rd 3:3
+ route-target export 3:3
+ route-target import 3:3
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip domain name DN.com
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 510000 510999
+mpls ldp advertise-labels for loopback
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CSR1000V sn 9660PL8YBIS
+spanning-tree extend system-id
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 50.0.0.10 255.255.255.255
+ ip router isis 50
+ ipv6 address FE80::10 link-local
+ ipv6 address 2012:50::10/128
+ ipv6 router isis 50
+!
+interface GigabitEthernet1
+ no shutdown
+ description towards PE11 gi2
+ ip address 50.10.11.10 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::10 link-local
+ ipv6 address 2012:50:10:11::10/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet2
+ no shutdown
+ description towards PE12 gi3
+ ip address 50.10.12.10 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::10 link-local
+ ipv6 address 2012:50:10:12::10/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet3
+ no shutdown
+ description towards CE21 e0/0
+ vrf forwarding O
+ ip address 200.10.21.10 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 200 area 0
+ negotiation auto
+ ipv6 address FE80::10 link-local
+ ipv6 address 2012:200:10:21::10/112
+ ospfv3 200 ipv6 area 0
+ ospfv3 200 ipv6 network point-to-point
+!
+interface GigabitEthernet4
+ no shutdown
+ ip address dhcp
+ negotiation auto
+!
+interface GigabitEthernet5
+ no shutdown
+ no ip address
+ shutdown
+ negotiation auto
+!
+router ospfv3 200
+ !
+ address-family ipv6 unicast vrf O
+  redistribute bgp 50
+  router-id 200.0.0.10
+ exit-address-family
+!
+router ospf 200 vrf O
+ router-id 200.0.0.10
+ redistribute bgp 50 subnets
+!
+router isis 50
+ net 49.0050.0000.0010.00
+ is-type level-2-only
+ metric-style wide
+ !
+ address-family ipv6
+  multi-topology
+ exit-address-family
+ mpls ldp autoconfig level-2
+!
+router bgp 50
+ bgp router-id 50.0.0.10
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR peer-group
+ neighbor RR remote-as 50
+ neighbor RR update-source Loopback0
+ neighbor 50.0.0.28 peer-group RR
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR send-community both
+  neighbor 50.0.0.28 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR send-community both
+  neighbor 50.0.0.28 activate
+ exit-address-family
+ !
+ address-family ipv4 vrf O
+  redistribute ospf 200 match internal external 1 external 2
+ exit-address-family
+ !
+ address-family ipv6 vrf O
+  redistribute ospf 200 match internal external 1 external 2
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard loopback
+ permit 50.0.0.0 0.0.0.255
+!
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+!
+line con 0
+line vty 0
+ login local
+ transport input ssh
+line vty 1
+ login local
+ length 0
+ transport input ssh
+line vty 2 4
+ login local
+ transport input ssh
+!
+!
+end

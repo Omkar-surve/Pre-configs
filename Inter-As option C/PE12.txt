@@ -1,0 +1,244 @@
+!
+! Last configuration change at 06:00:38 UTC Mon Dec 24 2018
+!
+version 15.5
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname PE12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password cisco
+!
+no aaa new-model
+no process cpu autoprofile hog
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+
+ip domain name DN.com
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label range 512000 512999
+mpls ldp advertise-labels for loopback
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9HY48NQJHFR
+!
+spanning-tree extend system-id
+!
+username admin password 0 admin
+username omkar privilege 15 password 0 omkar
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface Loopback0
+ no shutdown
+ description Mgmt
+ ip address 50.0.0.12 255.255.255.255
+ ip router isis 50
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50::12/112
+ ipv6 router isis 50
+!
+interface GigabitEthernet1
+ no shutdown
+ description towards PE28 e0/0
+ ip address 50.12.28.12 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50:12:28::12/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet2
+ no shutdown
+ description towards PE9 gi1
+ ip address 50.9.12.12 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50:9:12::12/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet3
+ no shutdown
+ description towards PE10 gi2
+ ip address 50.10.12.12 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50:10:12::12/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet4
+ no shutdown
+ description towards PE11 gi4
+ ip address 50.11.12.12 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50:11:12::12/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet5
+ no shutdown
+ description towards PE8 gi4
+ ip address 50.8.12.12 255.255.255.0
+ ip router isis 50
+ negotiation auto
+ ipv6 address FE80::12 link-local
+ ipv6 address 2012:50:8:12::12/112
+ ipv6 router isis 50
+ isis network point-to-point 
+!
+interface GigabitEthernet6
+ no shutdown
+ ip address dhcp
+ negotiation auto
+!
+router isis 50
+ net 49.0050.0000.0012.00
+ is-type level-2-only
+ metric-style wide
+ !
+ address-family ipv6
+  multi-topology
+ exit-address-family
+ mpls ldp autoconfig level-2
+!
+router bgp 50
+ bgp router-id 50.0.0.12
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default route-target filter
+ neighbor RR peer-group
+ neighbor RR remote-as 50
+ neighbor RR update-source Loopback0
+ neighbor 50.0.0.28 peer-group RR
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor RR send-community both
+  neighbor 50.0.0.28 activate
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor RR send-community both
+  neighbor 50.0.0.28 activate
+ exit-address-family
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet6
+!
+ip access-list standard loopback
+ permit 50.0.0.0 0.0.0.255
+!
+!
+mpls ldp router-id Loopback0
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ stopbits 1
+line vty 0
+ login local
+ transport input ssh
+line vty 1
+ login local
+ length 0
+ transport input ssh
+line vty 2 4
+ login local
+ transport input ssh
+!
+!
+end
