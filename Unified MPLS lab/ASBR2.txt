@@ -1,14 +1,100 @@
 !! IOS XR Configuration 5.2.2
-!! Last configuration change at Mon Nov 19 17:21:33 2018 by cisco
+!! Last configuration change at Thu Jan  3 13:35:20 2019 by cisco
 !
 hostname ASBR2
+domain name DN.com
+taskgroup L1_READ_ONLY
+ task read fr
+ task read li
+ task read aaa
+ task read acl
+ task read bfd
+ task read bgp
+ task read cdp
+ task read cef
+ task read cgn
+ task read eem
+ task read nps
+ task read otn
+ task read pbr
+ task read ppp
+ task read qos
+ task read rib
+ task read rip
+ task read sbc
+ task read boot
+ task read diag
+ task read dwdm
+ task read hdlc
+ task read hsrp
+ task read ipv4
+ task read ipv6
+ task read isis
+ task read lisp
+ task read lpts
+ task read ospf
+ task read ouni
+ task read rcmd
+ task read snmp
+ task read vlan
+ task read vrrp
+ task read eigrp
+ task read l2vpn
+ task read bundle
+ task read fabric
+ task read static
+ task read sysmgr
+ task read system
+ task read tunnel
+ task read drivers
+ task read logging
+ task read monitor
+ task read mpls-te
+ task read netflow
+ task read network
+ task read pos-dpt
+ task read firewall
+ task read mpls-ldp
+ task read pkg-mgmt
+ task read interface
+ task read inventory
+ task read multicast
+ task read route-map
+ task read sonet-sdh
+ task read transport
+ task read ext-access
+ task read filesystem
+ task read tty-access
+ task read config-mgmt
+ task read ip-services
+ task read mpls-static
+ task read route-policy
+ task read host-services
+ task read basic-services
+ task read config-services
+ task read ethernet-services
+ description only Read access to user
+!
+usergroup L1_READ
+ taskgroup L1_READ_ONLY
+!
+username omkars
+ password 7 0609022A4D5C1A
+!
+username L1_omkar
+ group L1_READ
+ password 7 123554281D06070538
+!
+ipv4 access-list SSH_ACCESS_IPv4
+ 10 permit ipv4 10.255.255.0/24 any log
+!
 interface Loopback0
  ipv4 address 192.0.0.2 255.255.255.255
  ipv6 address fe80::2 link-local
  ipv6 address 2018:abcd:192::2/128
 !
 interface MgmtEth0/0/CPU0/0
- shutdown
+ ipv4 address dhcp
 !
 interface GigabitEthernet0/0/0/0
  description towards P1 e0/1
@@ -42,6 +128,7 @@ interface GigabitEthernet0/0/0/4
 !
 interface GigabitEthernet0/0/0/5
  description towards EXTRANET8
+ shutdown
 !
 route-policy eBGP_all
   pass
@@ -118,5 +205,8 @@ mpls ldp
  address-family ipv4
  !
 !
+ssh client source-interface MgmtEth0/0/CPU0/0
+ssh server v2
+ssh server vrf default ipv4 access-list SSH_ACCESS_IPv4 ipv6 access-list SSH_ACCESS_IPv6
 mpls label range table 0 100200 100299
 end
