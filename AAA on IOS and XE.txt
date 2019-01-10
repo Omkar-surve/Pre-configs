@@ -1,0 +1,21 @@
+service password-encryption 
+privilege exec all level 2 show
+!
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local 
+aaa authorization commands 3 default local 
+!
+!
+line con 0
+login authentication default 
+authorization exec default 
+!
