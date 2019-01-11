@@ -1,8 +1,12 @@
-Current configuration : 3383 bytes
+Current configuration : 4108 bytes
+!
+! Last configuration change at 08:27:21 UTC Fri Jan 11 2019 by L3
 !
 version 15.5
+service config
 service timestamps debug datetime msec
 service timestamps log datetime msec
+service password-encryption
 no platform punt-keepalive disable-kernel-core
 platform console serial
 !
@@ -13,19 +17,33 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local 
+aaa authorization commands 5 default local 
+aaa authorization commands 10 default local 
+aaa authorization commands 15 default local 
+!
+!
+!
+!
+!
+aaa session-id common
 !
 !
 !
 !
 !
 !
-!         
 !
 !
 !
 !
-
+!
+          
 
 
 !
@@ -43,6 +61,11 @@ subscriber templating
 !
 mpls label range 100300 100399
 multilink bundle-name authenticated
+!
+!
+!
+!
+!
 !         
 !
 !
@@ -51,23 +74,22 @@ multilink bundle-name authenticated
 !
 !
 !
-!
-!
-!
-!
-!
-license udi pid CSR1000V sn 9PCTLHHI500
+license udi pid CSR1000V sn 9EQSZ6HTQ4S
 !
 spanning-tree extend system-id
 !
+username admin privilege 15 password 7 082048430017
+username L1 privilege 5 password 7 123554
+username L2 privilege 10 password 7 123557
+username L3 privilege 15 password 7 072372
 !
 redundancy
 !
 !
 !
 !
-!         
 !
+!         
 ! 
 !
 !
@@ -135,10 +157,15 @@ interface GigabitEthernet5
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:3:10::3/112
  mpls bgp forwarding
-!         
+!
 interface GigabitEthernet6
  description towards INET7 gi1
  no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet7
+ ip address dhcp
  negotiation auto
 !
 router isis CORE
@@ -196,31 +223,32 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
+ip tftp source-interface GigabitEthernet7
 !
 !
 mpls ldp router-id Loopback0 force
+!         
+!
 !
 !
 control-plane
 !
  !
- !        
  !
  !
+ !
 !
 !
 !
 !
+privilege exec level 15 show running-config
+privilege exec all level 5 show
 !
 line con 0
  stopbits 1
-line vty 0
- login
 line vty 1
- login
  length 0
 line vty 2 4
- login
 !
-!
+!         
 end
