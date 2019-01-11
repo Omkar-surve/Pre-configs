@@ -1,5 +1,9 @@
+Local AAA on IOS and XE:
+
 service password-encryption 
-privilege exec all level 2 show
+!         
+privilege exec all level 5 show
+! 
 !
 username admin privilege 15 password admin
 username L1 privilege 5 password L1
@@ -12,10 +16,18 @@ aaa new-model
 aaa authentication login default local
 aaa authorization console
 aaa authorization exec default local 
-aaa authorization commands 3 default local 
+aaa authorization commands 5 default local 
+aaa authorization commands 10 default local 
+aaa authorization commands 15 default local 
 !
 !
 line con 0
 login authentication default 
 authorization exec default 
 !
+
+
+for show run on any user level (only for local):
+show run view full
+
+note: rest all show commands work. Show run command have default privilege of 15. even after reconfigured to different, privilege level doesn't change. check show run view full for verification.
