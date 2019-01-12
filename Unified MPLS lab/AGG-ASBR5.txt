@@ -15,8 +15,26 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+service password-encryption
+!         
+privilege exec all level 5 show
+! 
+! 
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
 !
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local
+aaa authorization commands 5 default local
+aaa authorization commands 10 default local
+aaa authorization commands 15 default local
+!!
 !
 !
 !
@@ -88,7 +106,7 @@ interface GigabitEthernet1
  description towards AGG-ASBR6 gi3
  ip address 172.5.6.5 255.255.255.0
  ip router isis CORE
- shutdown
+ no shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:6::5/112
@@ -101,7 +119,7 @@ interface GigabitEthernet2
  description towards AGG-ASBR4 gi4
  ip address 172.4.5.5 255.255.255.0
  ip router isis CORE
- shutdown
+ no shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:4:5::5/112
@@ -113,7 +131,7 @@ interface GigabitEthernet3
  description towards AGG-ASBR12 gi3
  ip address 172.5.12.5 255.255.255.0
  ip router isis CORE
- shutdown
+ no shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:12::5/112
@@ -126,7 +144,7 @@ interface GigabitEthernet4
  description towards ASBR15 e0/0
  ip address 172.5.15.5 255.255.255.0
  ip router isis CORE
- shutdown
+ no shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:15::5/112
@@ -139,7 +157,7 @@ interface GigabitEthernet5
  description towards ASBR14 e0/1
  ip address 172.5.14.5 255.255.255.0
  ip router isis CORE
- shutdown
+ no shutdown
  negotiation auto
  ipv6 address FE80::5 link-local
  ipv6 address 2018:ABCD:172:5:14::5/112
@@ -149,8 +167,9 @@ interface GigabitEthernet5
  isis network point-to-point 
 !
 interface GigabitEthernet6
- no ip address
- shutdown
+ description Mgmt
+ ip address 10.10.1.5 255.255.255.0
+ no shutdown
  negotiation auto
 !
 router isis CORE
@@ -268,14 +287,19 @@ control-plane
 !
 !
 line con 0
+ login authentication default
+ authorization exec default
  stopbits 1
 line vty 0
- login
+ login authentication default
+ authorization exec default
 line vty 1
- login
+ login authentication default
+ authorization exec default
  length 0 
 line vty 2 4
- login
+ login authentication default
+ authorization exec default
 !
 !
 end
