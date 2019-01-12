@@ -14,7 +14,26 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+service password-encryption
+!         
+privilege exec all level 5 show
+! 
+! 
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local
+aaa authorization commands 5 default local
+aaa authorization commands 10 default local
+aaa authorization commands 15 default local
+!
 !
 !
 !
@@ -83,6 +102,7 @@ interface Loopback0
 !
 interface Ethernet0/0
  description towards AGG-ASBR11 gi0/0/0/2
+ no shutdown
  ip address 172.11.18.18 255.255.255.0
  ip router isis AGG_CORE
  ipv6 address FE80::18 link-local
@@ -92,6 +112,7 @@ interface Ethernet0/0
 !         
 interface Ethernet0/1
  description towards AGG-ASBR9 gi0/0/0/5
+ no shutdown
  ip address 172.9.18.18 255.255.255.0
  ip router isis AGG_CORE
  ipv6 address FE80::18 link-local
@@ -101,6 +122,7 @@ interface Ethernet0/1
 !
 interface Ethernet0/2
  description towards ASBR19 e0/2
+ no shutdown
  ip address 172.18.19.18 255.255.255.0
  ip router isis AGG_CORE
  ipv6 address FE80::18 link-local
@@ -110,6 +132,7 @@ interface Ethernet0/2
 !
 interface Ethernet0/3
  description towards PE28 e0/0
+ no shutdown
  ip address 172.18.28.18 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -120,6 +143,7 @@ interface Ethernet0/3
 !
 interface Ethernet1/0
  description towards PE25 gi2
+ no shutdown
  ip address 172.18.25.18 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -129,8 +153,9 @@ interface Ethernet1/0
  ipv6 ospf network point-to-point
 !
 interface Ethernet1/1
- no ip address
- shutdown
+ ip address 10.10.1.18 255.255.255.0
+ no shutdown
+ description Mgmt
 !
 interface Ethernet1/2
  no ip address
@@ -260,10 +285,13 @@ control-plane
 !
 !
 line con 0
+ login authentication default
+ authorization exec default
  logging synchronous
 line aux 0
 line vty 0 4
- login
+ login authentication default
+ authorization exec default
  transport input none
 !
 !
