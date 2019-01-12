@@ -3,6 +3,7 @@ Current configuration : 5730 bytes
 ! Last configuration change at 16:52:22 UTC Thu Dec 6 2018
 !
 version 15.5
+service password-encryption
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no platform punt-keepalive disable-kernel-core
@@ -15,8 +16,20 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+aaa new-model
 !
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local
+aaa authorization commands 5 default local
+aaa authorization commands 10 default local
+aaa authorization commands 15 default local
+!
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
 !
 !
 !
@@ -97,6 +110,7 @@ interface Loopback0
  ipv6 address 2018:ABCD:172::12/128
 !
 interface GigabitEthernet1
+ no shutdown
  description towards AGG-ASBR4 gi3
  ip address 172.4.12.12 255.255.255.0
  ip router isis CORE
@@ -108,6 +122,7 @@ interface GigabitEthernet1
  isis network point-to-point 
 !
 interface GigabitEthernet2
+ no shutdown
  description towards AGG-ASBR6 gi4
  ip address 172.6.12.12 255.255.255.0
  ip router isis CORE
@@ -118,6 +133,7 @@ interface GigabitEthernet2
  isis network point-to-point 
 !
 interface GigabitEthernet3
+ no shutdown
  description towards AGG-ASBR5 gi3
  ip address 172.5.12.12 255.255.255.0
  ip router isis CORE
@@ -129,6 +145,7 @@ interface GigabitEthernet3
  isis network point-to-point 
 !
 interface GigabitEthernet4
+ no shutdown
  description towards ASBR16 e0/1
  ip address 172.12.16.12 255.255.255.0
  ip router isis CORE
@@ -140,6 +157,7 @@ interface GigabitEthernet4
  isis network point-to-point 
 !
 interface GigabitEthernet5
+ no shutdown
  description towards ASBR17 e0/2
  ip address 172.12.17.12 255.255.255.0
  ip router isis CORE
@@ -151,8 +169,9 @@ interface GigabitEthernet5
  isis network point-to-point 
 !
 interface GigabitEthernet6
- no ip address
- shutdown
+ description Mgmt
+ ip address 10.10.1.12 255.255.255.0
+ no shutdown
  negotiation auto
 !
 router isis CORE
@@ -265,6 +284,7 @@ route-map Loopback permit 20
 !
 mpls ldp router-id Loopback0 force
 !
+privilege exec all level 5 show
 !
 control-plane
 !
@@ -278,14 +298,19 @@ control-plane
 !
 !
 line con 0
+ login authentication default
+ authorization exec default
  stopbits 1
 line vty 0
- login
+ login authentication default
+ authorization exec default
 line vty 1
- login
+ login authentication default
+ authorization exec default
  length 0
 line vty 2 4
- login
+ login authentication default
+ authorization exec default
 !
 !
 end
