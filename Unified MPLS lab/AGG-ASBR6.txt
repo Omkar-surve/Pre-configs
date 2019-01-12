@@ -15,7 +15,25 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+service password-encryption
+!         
+privilege exec all level 5 show
+! 
+! 
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local
+aaa authorization commands 5 default local
+aaa authorization commands 10 default local
+aaa authorization commands 15 default local
 !
 !
 !
@@ -99,7 +117,7 @@ interface Loopback0
 interface GigabitEthernet1
  description towards ASBR3 gi3
  ip address 192.3.6.6 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:192:3:6::6/112
  mpls bgp forwarding
@@ -107,7 +125,7 @@ interface GigabitEthernet1
 interface GigabitEthernet2
  description towards ASBR2 gi0/0/0/2
  ip address 192.2.6.6 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:192:2:6::6/112
  mpls bgp forwarding
@@ -116,7 +134,7 @@ interface GigabitEthernet3
  description towards AGG-ASBR5 gi1
  ip address 172.5.6.6 255.255.255.0
  ip router isis CORE
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:172:5:6::6/112
  ipv6 router isis CORE
@@ -127,7 +145,7 @@ interface GigabitEthernet4
  description towards AGG-ASBR12 gi2
  ip address 172.6.12.6 255.255.255.0
  ip router isis CORE
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:172:6:12::6/112
  ipv6 router isis CORE
@@ -137,7 +155,7 @@ interface GigabitEthernet5
  description towards ASBR17 e0/1
  ip address 172.6.17.6 255.255.255.0
  ip router isis AGG_CORE
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:172:6:17::6/112
  ipv6 router isis AGG_CORE
@@ -148,12 +166,17 @@ interface GigabitEthernet6
  description towards ASBR16 e0/2
  ip address 172.6.16.6 255.255.255.0
  ip router isis AGG_CORE
- negotiation auto
+ no shutdown
  ipv6 address FE80::6 link-local
  ipv6 address 2018:ABCD:172:6:16::6/112
  ipv6 router isis AGG_CORE
  isis circuit-type level-2-only
  isis network point-to-point 
+!
+interface GigabitEthernet7
+ no shutdown
+ description Mgmt
+ ip address 10.10.1.6 255.255.255.0
 !
 router isis AGG_CORE
  net 49.0001.0172.1000.0006.00
@@ -323,14 +346,19 @@ control-plane
 !
 !
 line con 0
+ login authentication default
+ authorization exec default
  stopbits 1
 line vty 0
- login
+ login authentication default
+ authorization exec default
 line vty 1
- login
+ login authentication default
+ authorization exec default
  length 0
 line vty 2 4
- login
+ login authentication default
+ authorization exec default
 !
 !
 end
