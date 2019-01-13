@@ -12,7 +12,25 @@ boot-end-marker
 !
 !
 !
-no aaa new-model
+service password-encryption 
+!         
+privilege exec all level 5 show
+! 
+!
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local 
+aaa authorization commands 5 default local 
+aaa authorization commands 10 default local 
+aaa authorization commands 15 default local 
 !
 !
 !
@@ -80,13 +98,15 @@ interface Loopback0
 !
 interface Ethernet0/0
  description towards PE27 e0/2
+ no shutdown
  ip address 10.27.32.32 255.255.255.0
  ipv6 address FE80::32 link-local
  ipv6 address 2018:C1:10:27:32::32/112
 !
 interface Ethernet0/1
- no ip address
- shutdown
+ ip address 10.10.1.32 255.255.255.0
+ description Mgmt
+ no shutdown
 !
 interface Ethernet0/2
  no ip address
@@ -138,10 +158,13 @@ control-plane
 !         
 !
 line con 0
+ login authentication default 
+ authorization exec default 
  logging synchronous
 line aux 0
 line vty 0 4
- login
+ login authentication default 
+ authorization exec default 
  transport input none
 !
 !
