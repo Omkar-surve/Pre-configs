@@ -25,7 +25,25 @@ vrf definition Client_3
  exit-address-family
 !
 !
-no aaa new-model
+service password-encryption 
+!         
+privilege exec all level 5 show
+! 
+!
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local 
+aaa authorization commands 5 default local 
+aaa authorization commands 10 default local 
+aaa authorization commands 15 default local 
 !
 !
 !
@@ -112,6 +130,7 @@ interface Loopback0
 !
 interface GigabitEthernet1
  description towards ASBR19 e0/3
+ no shutdown
  ip address 172.19.25.25 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -123,6 +142,7 @@ interface GigabitEthernet1
 !
 interface GigabitEthernet2
  description towards ASBR18 e1/0
+ no shutdown
  ip address 172.18.25.25 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -134,6 +154,7 @@ interface GigabitEthernet2
 !
 interface GigabitEthernet3
  description towards CE35 e0/0
+ no shutdown
  vrf forwarding Client_3
  ip address 10.25.35.25 255.255.255.0
  negotiation auto
@@ -141,8 +162,9 @@ interface GigabitEthernet3
  ipv6 address 2018:C3:10:25:35::25/112
 !
 interface GigabitEthernet4
- no ip address
- shutdown
+ ip address 10.10.1.25 255.255.255.0
+ no shutdown
+ description Mgmt
  negotiation auto
 !
 router ospf 1
@@ -258,9 +280,12 @@ control-plane
 !
 !
 line con 0
+ login authentication default 
+ authorization exec default 
  stopbits 1
 line vty 0 4
- login
+ login authentication default 
+ authorization exec default 
 !
 !
 end
