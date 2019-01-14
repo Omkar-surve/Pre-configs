@@ -26,7 +26,25 @@ vrf definition Client_2
  exit-address-family
 !
 !
-no aaa new-model
+service password-encryption 
+!         
+privilege exec all level 5 show
+! 
+!
+username admin privilege 15 password admin
+username L1 privilege 5 password L1
+username L2 privilege 10 password L2
+username L3 privilege 15 password L3
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization console
+aaa authorization exec default local 
+aaa authorization commands 5 default local 
+aaa authorization commands 10 default local 
+aaa authorization commands 15 default local 
 !
 !
 !
@@ -99,6 +117,7 @@ interface Loopback0
 !
 interface Ethernet0/0
  description towards ASBR18 e0/3
+ no shutdown
  ip address 172.18.28.28 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -109,6 +128,7 @@ interface Ethernet0/0
 !
 interface Ethernet0/1
  description towards ASBR19 e1/0
+ no shutdown
  ip address 172.19.28.28 255.255.255.0
  ip ospf network point-to-point
  ip ospf 1 area 0
@@ -119,14 +139,16 @@ interface Ethernet0/1
 !
 interface Ethernet0/2
  description towards CE34 e0/0
+ no shutdown
  vrf forwarding Client_2
  ip address 10.28.34.28 255.255.255.0
  ipv6 address FE80::28 link-local
  ipv6 address 2018:C2:10:28:34::28/112
 !
 interface Ethernet0/3
- no ip address
- shutdown
+ ip address 10.10.1.28 255.255.255.0
+ no shutdown
+ description Mgmt
 !
 router ospf 1
  mpls ldp autoconfig
@@ -242,10 +264,13 @@ control-plane
 !
 !
 line con 0
+ login authentication default 
+ authorization exec default 
  logging synchronous
 line aux 0
 line vty 0 4
- login
+ login authentication default 
+ authorization exec default 
  transport input none
 !
 !
