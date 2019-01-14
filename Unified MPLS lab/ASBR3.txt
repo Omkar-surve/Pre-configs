@@ -120,7 +120,7 @@ interface GigabitEthernet1
  description towards P1 e0/0
  ip address 192.1.3.3 255.255.255.0
  ip router isis CORE
- negotiation auto
+ no shutdown
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:1:3::3/112
  ipv6 router isis CORE
@@ -129,7 +129,7 @@ interface GigabitEthernet1
 interface GigabitEthernet2
  description towards AGG-ASBR4 gi1
  ip address 192.3.4.3 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:3:4::3/112
  mpls bgp forwarding
@@ -137,7 +137,7 @@ interface GigabitEthernet2
 interface GigabitEthernet3
  description towards AGG-ASBR6 gi1
  ip address 192.3.6.3 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:3:6::3/112
  mpls bgp forwarding
@@ -145,7 +145,7 @@ interface GigabitEthernet3
 interface GigabitEthernet4
  description towards AGG-ASBR9 gi0/0/0/0
  ip address 192.3.9.3 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:3:9::3/112
  mpls bgp forwarding
@@ -153,7 +153,7 @@ interface GigabitEthernet4
 interface GigabitEthernet5
  description towards AGG-ASBR10 gi0/0/0/0
  ip address 192.3.10.3 255.255.255.0
- negotiation auto
+ no shutdown
  ipv6 address FE80::3 link-local
  ipv6 address 2018:ABCD:192:3:10::3/112
  mpls bgp forwarding
